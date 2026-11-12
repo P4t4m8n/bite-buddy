@@ -13,6 +13,10 @@ export type FoodSearchResult = {
   protein100: number;
   carbs100: number;
   fat100: number;
+  fiber100: number | null;
+  sugar100: number | null;
+  satFat100: number | null;
+  sodium100: number | null;
 };
 
 export type FoodSearchPage = {
@@ -42,7 +46,8 @@ export const searchFoods = async ({
 
   // One extra row tells us whether there is a next page.
   const rows = await db.$queryRaw<FoodSearchResult[]>`
-    SELECT id, name, brands, "imageUrl", unit, "kcal100", "protein100", "carbs100", "fat100"
+    SELECT id, name, brands, "imageUrl", unit, "kcal100", "protein100", "carbs100", "fat100",
+      "fiber100", "sugar100", "satFat100", "sodium100"
     FROM "Food"
     WHERE "hasNutrition"
       AND ("createdById" IS NULL OR "createdById" = ${userId})

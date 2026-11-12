@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "next build && playwright test",
     "test:e2e:update": "next build && playwright test --update-snapshots",
+    "verify": "prettier --write . && eslint && tsc --noEmit && vitest run && next build && playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "postinstall": "prisma generate",

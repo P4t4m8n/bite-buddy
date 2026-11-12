@@ -2,7 +2,7 @@ import type { FoodUnit } from "@/generated/prisma/enums";
 import { formatNutrient, UNIT_LABELS } from "@/lib/nutrition/format";
 import type { NutrientKey, Nutrients } from "@/lib/nutrition/types";
 
-const ROWS: { key: NutrientKey; label: string; sub?: boolean }[] = [
+export const NUTRIENT_ROWS: { key: NutrientKey; label: string; sub?: boolean }[] = [
   { key: "kcal", label: "קלוריות" },
   { key: "protein", label: "חלבונים" },
   { key: "carbs", label: "פחמימות" },
@@ -30,7 +30,7 @@ export const NutritionTable = ({ per100, amount, unit, amountLabel }: NutritionT
       </tr>
     </thead>
     <tbody>
-      {ROWS.map(({ key, label, sub }) => (
+      {NUTRIENT_ROWS.map(({ key, label, sub }) => (
         <tr key={key} className="border-b border-foreground/5 last:border-0">
           <th
             scope="row"

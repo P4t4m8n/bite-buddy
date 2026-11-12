@@ -1,32 +1,33 @@
 "use client";
 
-import { useState } from "react";
-
 import { MacroSplitBar } from "@/components/food/macro-split-bar";
 import { NutritionTable } from "@/components/food/nutrition-table";
+import { displayAmount, MAX_AMOUNT } from "@/lib/nutrition/amount";
 import { UNIT_LABELS } from "@/lib/nutrition/format";
 import { foodPer100, scale } from "@/lib/nutrition/nutrients";
 
 import type { FoodUnit } from "@/generated/prisma/enums";
 import type { FoodNutrition } from "@/lib/nutrition/types";
 
-const MAX_AMOUNT = 5000;
 const QUICK_AMOUNTS = [50, 100, 200];
 
 type FoodAmountCalculatorProps = {
   nutrition: FoodNutrition;
   unit: FoodUnit;
   packageAmount: number | null;
+  /** The typed amount; the state lives in the parent so the actions can use it. */
+  input: string;
+  onInputChange: (value: string) => void;
 };
 
 export default function FoodAmountCalculator({
   nutrition,
   unit,
   packageAmount,
+  input,
+  onInputChange,
 }: FoodAmountCalculatorProps) {
-  const [input, setInput] = useState("100");
-  const parsed = Number(input);
-  const amount = Number.isFinite(parsed) && parsed >= 0 ? Math.min(parsed, MAX_AMOUNT) : 0;
+  const amount = displayAmount(input);
 
   const unitLabel = UNIT_LABELS[unit];
   const per100 = foodPer100(nutrition);
@@ -48,7 +49,7 @@ export default function FoodAmountCalculator({
             max={MAX_AMOUNT}
             step="any"
             value={input}
-            onChange={(event) => setInput(event.target.value)}
+            onChange={(event) => onInputChange(event.target.value)}
             className="h-11 w-28 rounded-lg border border-foreground/15 bg-background px-3 text-end tabular-nums focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none"
           />
           <span className="text-sm text-foreground/60">{unitLabel}</span>
@@ -58,7 +59,7 @@ export default function FoodAmountCalculator({
             <button
               key={value}
               type="button"
-              onClick={() => setInput(String(value))}
+              onClick={() => onInputChange(String(value))}
               aria-pressed={amount === value}
               className="rounded-full border border-foreground/15 px-3 py-1 text-sm aria-pressed:border-brand aria-pressed:bg-brand/10 aria-pressed:text-brand"
             >

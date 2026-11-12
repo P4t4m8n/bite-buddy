@@ -182,6 +182,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 - A **Private / Public toggle** on each meal (private by default).
 - Public meals: anyone signed in can view them and **Save a copy** (sets `copiedFromId`). Only the owner can edit or delete.
 - Use API route handlers (`app/api/meals/...`) for create, update, delete and toggle, with Zod validation and ownership checks.
+- Built: `GET/POST /api/meals`, `PATCH/DELETE /api/meals/[id]`, `POST /api/meals/[id]/copy`, `POST /api/meals/[id]/items` (append from the food page's "הוספה לארוחה" dialog). Someone else's public meal → 403 on writes; a private one → 404. Reordering uses up/down buttons.
 
 **Done when:** you can build "Oatmeal + PB + milk (ml)", see correct per-item and total nutrients, and the meal persists. A public meal is visible to a second user and a private one isn't.
 

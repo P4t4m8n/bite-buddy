@@ -2,8 +2,7 @@ import { Food } from "@/generated/prisma/client";
 import { FoodImage } from "./food/food-image";
 import { translateAllergen } from "@/lib/food/allergens";
 import { UNIT_LABELS } from "@/lib/nutrition/format";
-import { ClipboardPlus, UtensilsCrossed } from "lucide-react";
-import FoodAmountCalculator from "./food/food-amount-calculator";
+import FoodAmountActions from "./food/food-amount-actions";
 import { NutriScoreBadge, NovaBadge } from "./food/food-badges";
 
 type FoodDetailsProps = {
@@ -14,7 +13,9 @@ export default function FoodDetails({ food }: FoodDetailsProps) {
     <article className="space-y-6">
       <Header food={food} />
 
-      <FoodAmountCalculator
+      <FoodAmountActions
+        foodId={food.id}
+        foodName={food.name}
         nutrition={{
           kcal100: food.kcal100,
           protein100: food.protein100,
@@ -27,12 +28,9 @@ export default function FoodDetails({ food }: FoodDetailsProps) {
         }}
         unit={food.unit}
         packageAmount={food.packageAmount}
-      />
-
-      <Allergens allergens={food.allergens} />
-
-      {/* Enabled in Step 7 (meals) and Step 9 (diary). */}
-      <Actions />
+      >
+        <Allergens allergens={food.allergens} />
+      </FoodAmountActions>
     </article>
   );
 }
@@ -74,30 +72,5 @@ const Allergens = ({ allergens }: { allergens: string[] }) => {
         ))}
       </ul>
     </section>
-  );
-};
-
-const Actions = () => {
-  return (
-    <div className="grid grid-cols-2 gap-3">
-      <button
-        type="button"
-        disabled
-        title="בקרוב"
-        className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
-      >
-        <ClipboardPlus aria-hidden className="size-4" />
-        הוספה ליומן
-      </button>
-      <button
-        type="button"
-        disabled
-        title="בקרוב"
-        className="flex h-11 items-center justify-center gap-2 rounded-full border border-foreground/15 font-medium disabled:opacity-50"
-      >
-        <UtensilsCrossed aria-hidden className="size-4" />
-        הוספה לארוחה
-      </button>
-    </div>
   );
 };

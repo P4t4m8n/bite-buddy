@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { blockProductImages, denyCamera, signedOut } from "./support/helpers";
+import { TEST_USER, withDb } from "./support/test-user";
 
 // Visual regression snapshots. Update baselines after intended UI changes with
 // `npm run test:e2e:update`.
@@ -38,4 +39,32 @@ test("scan page without a camera", async ({ page }) => {
   await expect(page.getByText("אין הרשאה להשתמש במצלמה", { exact: false })).toBeVisible();
   await expect(page.getByLabel("הקלדת ברקוד")).toBeVisible();
   await expect(page).toHaveScreenshot("scan.png");
+});
+
+test.describe("meals", () => {
+  test.beforeEach(async ({ request }) => {
+    await withDb((client) =>
+      client.query(`DELETE FROM "Meal" WHERE "userId" = $1`, [TEST_USER.id]),
+    );
+    const search = await request.get(`/api/foods?q=${encodeURIComponent("קוטג' 9%")}`);
+    const [food] = ((await search.json()) as { items: { id: string }[] }).items;
+    const response = await request.post("/api/meals", {
+      data: { name: "ארוחת בוקר", visibility: "PUBLIC", items: [{ foodId: food.id, amount: 200 }] },
+    });
+    mealId = ((await response.json()) as { id: string }).id;
+  });
+
+  let mealId = "";
+
+  test("meals list", async ({ page }) => {
+    await page.goto("/meals");
+    await expect(page.getByRole("link", { name: /ארוחת בוקר/ })).toBeVisible();
+    await expect(page).toHaveScreenshot("meals.png");
+  });
+
+  test("meal editor", async ({ page }) => {
+    await page.goto(`/meals/${mealId}`);
+    await expect(page.getByLabel("שם הארוחה")).toHaveValue("ארוחת בוקר");
+    await expect(page).toHaveScreenshot("meal-editor.png", { fullPage: true });
+  });
 });
