@@ -32,7 +32,7 @@ export default function DailySummary({ totals, goals }: DailySummaryProps) {
               <div className="flex items-baseline justify-between text-sm">
                 <span className="font-medium">{row.label}</span>
                 <span className="tabular-nums">
-                  <span className={`font-semibold ${over ? "text-red-600" : ""}`}>
+                  <span className={`font-semibold ${over ? "text-red-600 dark:text-red-400" : ""}`}>
                     {roundNutrient(row.key, value)}
                   </span>
                   {goal ? <span className="text-foreground/60"> / {goal}</span> : null}{" "}

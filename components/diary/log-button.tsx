@@ -102,7 +102,7 @@ export default function LogButton({ target, className }: LogButtonProps) {
         title={canLog ? undefined : "יש לבחור כמות"}
         className={
           className ??
-          "flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
+          "flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-brand-foreground disabled:opacity-50"
         }
       >
         <ClipboardPlus aria-hidden className="size-4" />
@@ -152,7 +152,7 @@ export default function LogButton({ target, className }: LogButtonProps) {
               {MEAL_TYPES.map((type) => (
                 <label
                   key={type}
-                  className="flex h-10 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/10 has-checked:text-brand"
+                  className="flex h-10 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/5 has-checked:text-brand"
                 >
                   <input
                     type="radio"
@@ -188,7 +188,7 @@ export default function LogButton({ target, className }: LogButtonProps) {
           ) : null}
 
           {error ? (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-red-600 dark:text-red-400">
               {error}
             </p>
           ) : null}
@@ -196,7 +196,7 @@ export default function LogButton({ target, className }: LogButtonProps) {
           <button
             type="submit"
             disabled={saving}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-brand-foreground disabled:opacity-50"
           >
             {saving ? <LoaderCircle aria-hidden className="size-4 animate-spin" /> : null}
             רישום ביומן

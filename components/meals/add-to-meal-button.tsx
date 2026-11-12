@@ -164,7 +164,7 @@ export default function AddToMealButton({ foodId, foodName, amount, unit }: AddT
               <button
                 type="submit"
                 disabled={pending !== null}
-                className="flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-medium text-white disabled:opacity-50"
+                className="flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-medium text-brand-foreground disabled:opacity-50"
               >
                 {pending === "new" ? (
                   <LoaderCircle aria-hidden className="size-4 animate-spin" />
@@ -177,7 +177,7 @@ export default function AddToMealButton({ foodId, foodName, amount, unit }: AddT
           </form>
 
           {error ? (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-red-600 dark:text-red-400">
               {error}
             </p>
           ) : null}
@@ -207,7 +207,7 @@ const MealChoices = ({ meals, pending, onAdd, onRetry }: MealChoicesProps) => {
   }
   if (meals.status === "error") {
     return (
-      <p role="alert" className="text-sm text-red-600">
+      <p role="alert" className="text-sm text-red-600 dark:text-red-400">
         לא הצלחנו לטעון את הארוחות.{" "}
         <button type="button" onClick={onRetry} className="font-medium underline">
           נסו שוב

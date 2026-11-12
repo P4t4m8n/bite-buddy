@@ -134,3 +134,15 @@ test.describe("goals and stats", () => {
     });
   });
 });
+
+test.describe("dark mode", () => {
+  test.use({ colorScheme: "dark" });
+
+  test("food page in dark mode", async ({ page }) => {
+    await page.goto("/search?q=קוטג");
+    await page.getByRole("link", { name: /קוטג' 9%/ }).click();
+    await expect(page.getByRole("row", { name: /קלוריות/ })).toBeVisible();
+    await expectSettled(page);
+    await expect(page).toHaveScreenshot("food-dark.png");
+  });
+});

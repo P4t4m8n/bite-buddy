@@ -320,7 +320,7 @@ const LookupStatus = ({ lookup, onRetry, onReset }: LookupStatusProps) => {
             result.status === "incomplete" ? result.prefill : undefined,
           )}
           prefetch={false}
-          className="flex h-11 items-center gap-2 rounded-full bg-brand px-5 font-medium text-white"
+          className="flex h-11 items-center gap-2 rounded-full bg-brand px-5 font-medium text-brand-foreground"
         >
           <PackagePlus aria-hidden className="size-4" />
           יצירת מוצר

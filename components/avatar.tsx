@@ -21,7 +21,7 @@ export function Avatar({ name, image, size = 32 }: AvatarProps) {
     <span
       aria-hidden
       style={{ width: size, height: size }}
-      className="flex items-center justify-center rounded-full bg-brand text-sm font-semibold text-white"
+      className="flex items-center justify-center rounded-full bg-brand text-sm font-semibold text-brand-foreground"
     >
       {initial}
     </span>

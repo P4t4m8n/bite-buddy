@@ -27,7 +27,7 @@ export default function MealSection({ section }: { section: DiarySection }) {
       </div>
 
       {section.entries.length === 0 ? (
-        <p className="text-sm text-foreground/50">עוד לא נרשם כלום.</p>
+        <p className="text-sm text-foreground/60">עוד לא נרשם כלום.</p>
       ) : (
         <ul className="space-y-2">
           {section.entries.map((entry) => (

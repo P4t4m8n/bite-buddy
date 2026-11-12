@@ -61,7 +61,7 @@ export default function GoogleSignInButton({
         {pending ? "מעביר ל־Google…" : "המשך עם Google"}
       </button>
       {failed ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           ההתחברות נכשלה. נסו שוב.
         </p>
       ) : null}

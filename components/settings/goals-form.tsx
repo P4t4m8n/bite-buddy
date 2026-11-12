@@ -100,7 +100,7 @@ export default function GoalsForm({ goals }: GoalsFormProps) {
         {message ? (
           <p
             role={message.ok ? "status" : "alert"}
-            className={`text-sm ${message.ok ? "text-foreground/70" : "text-red-600"}`}
+            className={`text-sm ${message.ok ? "text-foreground/70" : "text-red-600 dark:text-red-400"}`}
           >
             {message.text}
           </p>
@@ -109,7 +109,7 @@ export default function GoalsForm({ goals }: GoalsFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-brand-foreground disabled:opacity-50"
         >
           {saving ? (
             <LoaderCircle aria-hidden className="size-4 animate-spin" />
@@ -179,7 +179,7 @@ const GoalCalculator = ({ onApply }: { onApply: (goals: GoalValues) => void }) =
             {(["male", "female"] as const).map((sex) => (
               <label
                 key={sex}
-                className="flex h-10 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/10 has-checked:text-brand"
+                className="flex h-10 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/5 has-checked:text-brand"
               >
                 <input
                   type="radio"
@@ -233,7 +233,7 @@ const GoalCalculator = ({ onApply }: { onApply: (goals: GoalValues) => void }) =
           </select>
         </div>
         {error ? (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-red-600 dark:text-red-400">
             {error}
           </p>
         ) : null}

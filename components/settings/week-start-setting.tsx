@@ -39,7 +39,7 @@ export default function WeekStartSetting({ value }: { value: WeekStart }) {
         {OPTIONS.map((option) => (
           <label
             key={option.value}
-            className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/10 has-checked:text-brand"
+            className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/5 has-checked:text-brand"
           >
             <input
               type="radio"
@@ -54,7 +54,7 @@ export default function WeekStartSetting({ value }: { value: WeekStart }) {
         ))}
       </div>
       {error ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       ) : null}

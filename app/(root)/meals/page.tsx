@@ -22,7 +22,7 @@ export default function MealsPage() {
         action={
           <Link
             href="/meals/new"
-            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-medium text-white"
+            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-medium text-brand-foreground"
           >
             <Plus aria-hidden className="size-4" />
             ארוחה חדשה

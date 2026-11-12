@@ -58,7 +58,7 @@ const NavItems = ({ pathname }: { pathname: string | null }) => (
             <span
               className={
                 isScan
-                  ? "-mt-6 flex size-12 items-center justify-center rounded-full bg-brand text-white shadow-lg"
+                  ? "-mt-6 flex size-12 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-lg"
                   : "flex size-6 items-center justify-center"
               }
             >

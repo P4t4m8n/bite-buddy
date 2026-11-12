@@ -136,7 +136,7 @@ export default function LogEntryRow({ entry }: { entry: DiaryEntry }) {
             type="submit"
             disabled={busy}
             aria-label="שמירה"
-            className="flex size-9 items-center justify-center rounded-lg bg-brand text-white disabled:opacity-50"
+            className="flex size-9 items-center justify-center rounded-lg bg-brand text-brand-foreground disabled:opacity-50"
           >
             {busy ? <LoaderCircle className="size-4 animate-spin" /> : <Check className="size-4" />}
           </button>
@@ -152,7 +152,7 @@ export default function LogEntryRow({ entry }: { entry: DiaryEntry }) {
       ) : null}
 
       {error ? (
-        <p role="alert" className="mt-1 text-sm text-red-600">
+        <p role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       ) : null}

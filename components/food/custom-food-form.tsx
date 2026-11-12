@@ -128,7 +128,7 @@ export default function CustomFoodForm({ initialValues }: CustomFoodFormProps) {
             {(["G", "ML"] as const).map((unit) => (
               <label
                 key={unit}
-                className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/10 has-checked:text-brand"
+                className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-foreground/15 text-sm has-checked:border-brand has-checked:bg-brand/5 has-checked:text-brand"
               >
                 <input
                   type="radio"
@@ -169,7 +169,7 @@ export default function CustomFoodForm({ initialValues }: CustomFoodFormProps) {
 
       <div className="space-y-3">
         {error ? (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-red-600 dark:text-red-400">
             {error}{" "}
             {existingId ? (
               <Link href={`/food/${existingId}`} className="font-medium underline">
@@ -181,7 +181,7 @@ export default function CustomFoodForm({ initialValues }: CustomFoodFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-brand-foreground disabled:opacity-50"
         >
           {saving ? (
             <LoaderCircle aria-hidden className="size-4 animate-spin" />

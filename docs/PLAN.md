@@ -221,6 +221,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 - Loading, empty and error states (`loading.tsx`, `error.tsx`), plus optimistic UI on log, edit and delete.
 - Accessibility pass and dark mode.
 - Playwright E2E tests: sign in → search → build a meal → log it → see stats.
+- Built: Hebrew `error.tsx` / `global-error.tsx` (loading states were already Suspense skeletons). An axe scan (`e2e/a11y.spec.ts`) checks the main screens in light and dark mode for serious WCAG A/AA issues; fixing contrast changed the brand green to `#15803d` and added `brand-foreground` for text on brand backgrounds. `e2e/journey.spec.ts` covers the full path. Optimistic UI was skipped: writes are fast and refresh the page.
 
 ### Step 12 — PWA
 

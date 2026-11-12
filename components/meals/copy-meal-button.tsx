@@ -30,7 +30,7 @@ export default function CopyMealButton({ mealId }: { mealId: string }) {
         type="button"
         onClick={copy}
         disabled={copying}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-brand-foreground disabled:opacity-50"
       >
         {copying ? (
           <LoaderCircle aria-hidden className="size-4 animate-spin" />
@@ -40,7 +40,7 @@ export default function CopyMealButton({ mealId }: { mealId: string }) {
         שמירת עותק
       </button>
       {error ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       ) : null}

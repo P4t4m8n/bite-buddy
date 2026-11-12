@@ -274,7 +274,7 @@ export default function MealEditor({ meal }: MealEditorProps) {
 
         <div className="space-y-3">
           {error ? (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-red-600 dark:text-red-400">
               {error}
             </p>
           ) : null}
@@ -284,7 +284,7 @@ export default function MealEditor({ meal }: MealEditorProps) {
           <button
             type="submit"
             disabled={busy !== null}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-brand-foreground disabled:opacity-50"
           >
             {busy === "saving" ? (
               <LoaderCircle aria-hidden className="size-4 animate-spin" />
@@ -298,7 +298,7 @@ export default function MealEditor({ meal }: MealEditorProps) {
               type="button"
               onClick={remove}
               disabled={busy !== null}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-full font-medium text-red-600 hover:bg-red-500/10 disabled:opacity-50"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full font-medium text-red-600 hover:bg-red-500/10 disabled:opacity-50 dark:text-red-400"
             >
               <Trash2 aria-hidden className="size-4" />
               מחיקת הארוחה

@@ -54,13 +54,17 @@ export default function ManualBarcodeForm({ disabled, onSubmit }: ManualBarcodeF
         <button
           type="submit"
           disabled={disabled}
-          className="h-12 shrink-0 rounded-xl bg-brand px-5 font-medium text-white disabled:opacity-50"
+          className="h-12 shrink-0 rounded-xl bg-brand px-5 font-medium text-brand-foreground disabled:opacity-50"
         >
           חיפוש
         </button>
       </div>
       {error ? (
-        <p id="manual-barcode-error" role="alert" className="text-sm text-red-600">
+        <p
+          id="manual-barcode-error"
+          role="alert"
+          className="text-sm text-red-600 dark:text-red-400"
+        >
           {error}
         </p>
       ) : null}

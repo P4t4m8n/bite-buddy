@@ -61,7 +61,7 @@ export default function FoodAmountCalculator({
               type="button"
               onClick={() => onInputChange(String(value))}
               aria-pressed={amount === value}
-              className="rounded-full border border-foreground/15 px-3 py-1 text-sm aria-pressed:border-brand aria-pressed:bg-brand/10 aria-pressed:text-brand"
+              className="rounded-full border border-foreground/15 px-3 py-1 text-sm aria-pressed:border-brand aria-pressed:bg-brand/5 aria-pressed:text-brand"
             >
               {value === packageAmount ? `אריזה (${value} ${unitLabel})` : `${value} ${unitLabel}`}
             </button>
