@@ -34,11 +34,11 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 - 14,367 items, all with a unique `barcode`.
 - Nutrients (`calories`, `proteins`, `carbohydrates`, `fat`, `sugars`, `fiber`, `saturatedFat`, `salt`, `sodium`) are Open Food Facts values **per 100 g/ml**. `salt` and `sodium` are in grams.
-- **About 52% of items have no calories or macros.** We keep them, mark them `hasNutrition = false`, and let users fill in the missing values (Step 8).
-- `servingSize` is unreliable (for example, `15128`), so we don't trust it. `quantity` is free text (for example, `"5.5 oz (158 g)"`); we parse a gram value from it where we can.
+- **Only 6,238 items (43%) have all of kcal, protein, carbs and fat** after cleaning. We keep the rest, mark them `hasNutrition = false`, and let users fill in the missing values (Step 8). Impossible values (over 900 kcal or over 100 g of a macro per 100) are dropped, and kcal is derived from kJ when only kJ is given.
+- `servingSize` is unreliable (for example, `15128`), so we don't trust it. `quantity` is free text in several languages and units (for example, `"5.5 oz (158 g)"`, `"6 x 30 g"`, `"500 גרם"`, `"0,514kg"`); we parse a package amount from it where we can (2,606 items).
 - `brand`, `categories`, `allergens`, `labels`, `ingredients` and `traces` are arrays of `{ name }`. We store them as `string[]`.
 - `images` lists many sizes. We keep the first `front_*.400.jpg` (or the first `*.400.jpg`) as `imageUrl`.
-- Drinks are measured in ml. We set `unit = ML` when `quantity` is in ml, cl or l, or when a category is a beverage. Otherwise we use `G`.
+- Drinks are measured in ml. We set `unit = ML` when `quantity` is in ml, cl, l or fl oz, or, with no quantity, when a category is an explicit drink category (not broad ones like "plant based foods and beverages", and not dry ones like "instant coffees"). Otherwise we use `G`. Result: 532 ML items.
 
 ---
 
