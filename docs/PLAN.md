@@ -160,14 +160,17 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 ### Step 6 — Barcode scanning
 
-- A client component `<BarcodeScanner>` that:
-  - Uses the `getUserMedia` rear camera with `BarcodeDetector` (EAN-13, EAN-8, UPC-A/E) when the browser supports it, and falls back to `@zxing/browser` (iOS Safari needs this).
-  - Includes a torch toggle, debounces duplicate reads, and offers manual barcode entry as a fallback.
-- Lookup flow `GET /api/foods/barcode/[code]`:
-  1. Look the barcode up in the DB.
-  2. If it is not found, fetch `https://world.openfoodfacts.org/api/v2/product/{code}` and normalize the result (reusing the Step 2 normalizer). If it has full macros and a Hebrew name, save it with `source = OFF` and return it (otherwise `db:prune-foods` would delete it later).
-  3. If Open Food Facts doesn't have it, or it lacks macros or a Hebrew name, offer to **create a custom food** (Step 8), prefilled with whatever is known.
+- A client component `<BarcodeScanner>` (`components/scan/barcode-scanner.tsx`) on `/scan` that:
+  - Uses the `getUserMedia` rear camera with `BarcodeDetector` (EAN-13, EAN-8, UPC-A/E) when the browser supports it, and falls back to `@zxing/browser` (iOS Safari needs this), loaded with a dynamic `import()` only when needed (`lib/scan/barcode-detection.ts`).
+  - Includes a torch toggle (when the camera track supports it), ignores the same code for 3 s and while a lookup is shown, stops the camera on unmount, and always shows a **manual barcode entry** form.
+  - Explains each camera state in Hebrew: requesting permission, permission denied, no camera, camera busy, no browser support, and insecure context (HTTP).
+- Lookup flow `GET /api/foods/barcode/[code]` (401 without a session, 400 unless the code is 8–14 digits):
+  1. Look the barcode up in the DB among the foods the user may see (a 12-digit UPC-A also matches its 13-digit form with a leading 0).
+  2. If it is not found, fetch `https://world.openfoodfacts.org/api/v2/product/{code}?fields=…` (only the mapped fields, a `BiteBuddy/0.1` User-Agent, 8 s timeout) and normalize the result: `lib/food/open-food-facts.ts` maps the OFF product to the seed shape (preferring `product_name_he`) and reuses the Step 2 normalizer. If it has full macros and a Hebrew name (so `db:prune-foods` keeps it), save it with `source = OFF` (`createMany` with `skipDuplicates`, so two parallel scans of the same barcode don't fail) and return `{ status: "found", food }`.
+  3. Otherwise return `{ status: "incomplete", prefill }` (whatever is known) or `{ status: "not_found", barcode }` (`offUnavailable: true` when Open Food Facts can't be reached). The scanner then links **יצירת מוצר** to `/foods/new?barcode=…&name=…&unit=…&kcal100=…` (Step 8 builds that page).
+  - Edge case: if another user's custom food already holds the barcode (barcodes are unique), the OFF product can't be saved and is returned as `incomplete`.
 - The camera needs HTTPS. For local phone testing, use `next dev --experimental-https` and open your LAN IP.
+- E2E tests use the manual entry form and deny the camera (headless browsers have none), so the scan page snapshot shows the fallback state. The Open Food Facts path is covered by unit tests with an injected `fetch`.
 
 **Done when:** on a real phone, scanning a seeded product opens its detail page, and an unseeded product is fetched and saved.
 

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { blockProductImages, signedOut } from "./support/helpers";
+import { blockProductImages, denyCamera, signedOut } from "./support/helpers";
 
 // Visual regression snapshots. Update baselines after intended UI changes with
 // `npm run test:e2e:update`.
@@ -30,4 +30,12 @@ test("food page", async ({ page }) => {
   await page.getByRole("link", { name: /קוטג' 9%/ }).click();
   await expect(page.getByRole("row", { name: /קלוריות/ })).toBeVisible();
   await expect(page).toHaveScreenshot("food.png");
+});
+
+test("scan page without a camera", async ({ page }) => {
+  await denyCamera(page);
+  await page.goto("/scan");
+  await expect(page.getByText("אין הרשאה להשתמש במצלמה", { exact: false })).toBeVisible();
+  await expect(page.getByLabel("הקלדת ברקוד")).toBeVisible();
+  await expect(page).toHaveScreenshot("scan.png");
 });
