@@ -1,6 +1,6 @@
 # Bite Buddy — Build Plan
 
-A mobile-first diet tracker. Users can scan or search foods, build meals, see nutrients per item and per meal, log what they eat, and track weekly macros.
+A mobile-first diet tracker in **Hebrew (RTL)**. Users can scan or search foods, build meals, see nutrients per item and per meal, log what they eat, and track weekly macros.
 
 Each step below is small enough for one branch or PR. Each one ends with a **Done when** check, so you can review it and adjust it before the next step starts.
 
@@ -8,18 +8,18 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 ## Stack (decided)
 
-| Concern    | Choice                                                                                                                 |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router, Server Components for reads, API route handlers for writes), React 19, TypeScript              |
-| Styling    | Tailwind CSS 4                                                                                                         |
-| Database   | PostgreSQL (local via Docker) + Prisma ORM                                                                             |
-| Auth       | Better Auth 1.7 (stable) + its Prisma adapter: Google sign-in only                                                     |
-| Food data  | `seed/foodItems.json` (14,367 Open Food Facts products), plus an on-demand Open Food Facts lookup for unknown barcodes |
-| Scanning   | Barcode only: native `BarcodeDetector`, with `@zxing/browser` as the fallback                                          |
-| Validation | Zod                                                                                                                    |
-| Charts     | Recharts                                                                                                               |
-| Tests      | Vitest (domain logic), Playwright (key flows, later)                                                                   |
-| PWA        | Last step                                                                                                              |
+| Concern    | Choice                                                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components for reads, API route handlers for writes), React 19, TypeScript                                               |
+| Styling    | Tailwind CSS 4                                                                                                                                          |
+| Database   | PostgreSQL (local via Docker) + Prisma ORM                                                                                                              |
+| Auth       | Better Auth 1.7 (stable) + its Prisma adapter: Google sign-in only                                                                                      |
+| Food data  | `seed/foodItems.json` (1,565 Open Food Facts products with Hebrew names and full macros), plus an on-demand Open Food Facts lookup for unknown barcodes |
+| Scanning   | Barcode only: native `BarcodeDetector`, with `@zxing/browser` as the fallback                                                                           |
+| Validation | Zod                                                                                                                                                     |
+| Charts     | Recharts                                                                                                                                                |
+| Tests      | Vitest (domain logic), Playwright (key flows, later)                                                                                                    |
+| PWA        | Last step                                                                                                                                               |
 
 ### Next.js 16 changes to keep in mind
 
@@ -32,9 +32,9 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 ## Seed data findings (they affect the design)
 
-- 14,367 items, all with a unique `barcode`.
+- The original export had 14,367 items, all with a unique `barcode`. `npm run seed:clean` reduced the file (18 MB → 1.3 MB) to the **1,565 products with a Hebrew name and full macros**.
 - Nutrients (`calories`, `proteins`, `carbohydrates`, `fat`, `sugars`, `fiber`, `saturatedFat`, `salt`, `sodium`) are Open Food Facts values **per 100 g/ml**. `salt` and `sodium` are in grams.
-- **Only 6,238 items (43%) have all of kcal, protein, carbs and fat** after cleaning. Only those are seeded; the rest are skipped, and `npm run db:prune-foods` removes incomplete shared foods already in the DB. New foods are added as needed (barcode lookups and custom foods). Impossible values (over 900 kcal or over 100 g of a macro per 100) are dropped, kcal is derived from kJ when only kJ is given, and sodium from salt (÷ 2.5) when only salt is given.
+- **Only 6,238 of the original items (43%) had all of kcal, protein, carbs and fat**, and only 1,565 of those have Hebrew names. The seed and `npm run db:prune-foods` keep only Hebrew-named foods with full macros. New foods are added as needed (barcode lookups and custom foods). Impossible values (over 900 kcal or over 100 g of a macro per 100) are dropped, kcal is derived from kJ when only kJ is given, and sodium from salt (÷ 2.5) when only salt is given.
 - `servingSize` is unreliable (for example, `15128`), so we don't trust it. `quantity` is free text in several languages and units (for example, `"5.5 oz (158 g)"`, `"6 x 30 g"`, `"500 גרם"`, `"0,514kg"`); we parse a package amount from it where we can (2,606 items).
 - `brand`, `categories`, `allergens`, `labels`, `ingredients` and `traces` are arrays of `{ name }`. We store them as `string[]`.
 - `images` lists many sizes. We keep the first `front_*.400.jpg` (or the first `*.400.jpg`) as `imageUrl`.
@@ -44,13 +44,15 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 ## Decisions
 
-| Topic            | Decision                                                                                                                                                  |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| What users track | Goals are macros only for now: kcal, protein, carbs and fat. Foods, meal totals and logs also track fiber, sugar, saturated fat and sodium (shown in mg). |
-| Units            | Each food is either grams (`G`) or millilitres (`ML`), with nutrients per 100 of that unit. For meal totals, 1 ml counts as 1 g.                          |
-| Meal sharing     | Each meal has a **Private / Public toggle** (private by default). Anyone signed in can browse public meals and save a copy. Only the owner can edit.      |
-| Week start       | A user setting, Sunday by default, changeable to Monday.                                                                                                  |
-| Sign-in          | Google only. No email sign-in, so no email service is needed. Email sign-in can be added later.                                                           |
+| Topic            | Decision                                                                                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What users track | Goals are macros only for now: kcal, protein, carbs and fat. Foods, meal totals and logs also track fiber, sugar, saturated fat and sodium (shown in mg).                           |
+| Units            | Each food is either grams (`G`) or millilitres (`ML`), with nutrients per 100 of that unit. For meal totals, 1 ml counts as 1 g.                                                    |
+| Meal sharing     | Each meal has a **Private / Public toggle** (private by default). Anyone signed in can browse public meals and save a copy. Only the owner can edit.                                |
+| Week start       | A user setting, Sunday by default, changeable to Monday.                                                                                                                            |
+| Sign-in          | Google only. No email sign-in, so no email service is needed. Email sign-in can be added later.                                                                                     |
+| Language         | Hebrew only, RTL (`<html lang="he" dir="rtl">`), Heebo font. Use logical CSS (`ps`/`pe`, `start`/`end`, `text-start`) instead of left/right. Hebrew units: קק״ל, ג׳, מ״ג, גרם, מ״ל. |
+| Products         | Shared foods must have a Hebrew name (`hasHebrew`) and full macros.                                                                                                                 |
 
 ---
 
@@ -112,10 +114,11 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 - Add `lib/food/normalize-seed.ts`, a pure function that maps a raw item to `Food`. It is unit tested and covers: missing nutrients, image selection, quantity parsing, g/ml detection and array flattening.
 - `prisma/seed.ts` reads the JSON, normalizes it, skips foods without full macros, and inserts the rest with `createMany` in batches of about 1,000 (`skipDuplicates`). It is idempotent.
-- `prisma/prune-foods.ts` (`npm run db:prune-foods [-- --dry-run]`) deletes shared (seed / Open Food Facts) foods without full macros, except foods used in saved meals.
+- `prisma/prune-foods.ts` (`npm run db:prune-foods [-- --dry-run]`) deletes shared (seed / Open Food Facts) foods without full macros or without a Hebrew name, except foods used in saved meals.
+- `prisma/clean-seed-file.ts` (`npm run seed:clean [-- --dry-run]`) rewrites `seed/foodItems.json` with the same rules.
 - Add the seed command to `migrations.seed` in `prisma.config.ts` (Prisma 7 no longer reads it from `package.json`), plus an `npm run db:seed` script.
 
-**Done when:** the seed inserts the 6,238 complete foods, re-running it adds none, and the normalizer tests pass.
+**Done when:** the seed inserts the 1,565 Hebrew foods with full macros, re-running it adds none, and the normalizer tests pass.
 
 ### Step 3 — Authentication
 
@@ -145,6 +148,8 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 - Add `lib/food/search.ts`: trigram plus `ILIKE` search on name and brand, ranked, and paginated (20 per page).
 - Search page: a debounced input (state stored in the URL `?q=`) that renders results on the server.
+- `GET /api/foods?q=&page=` returns the same search as JSON for client components (the Step 7 meal builder). It returns 401 JSON without a session.
+- Food images load directly from Open Food Facts (`unoptimized`, with a placeholder on error): their CDN can take 10–20 s, which made the Next.js image optimizer time out.
 - Food detail page `/food/[id]`:
   - A nutrition table per 100 g or 100 ml.
   - An **amount slider/input** (g or ml) that updates nutrients live (client component using `scale`).
@@ -160,8 +165,8 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
   - Includes a torch toggle, debounces duplicate reads, and offers manual barcode entry as a fallback.
 - Lookup flow `GET /api/foods/barcode/[code]`:
   1. Look the barcode up in the DB.
-  2. If it is not found, fetch `https://world.openfoodfacts.org/api/v2/product/{code}` and normalize the result (reusing the Step 2 normalizer). If it has full macros, save it with `source = OFF` and return it.
-  3. If Open Food Facts doesn't have it, or it lacks macros, offer to **create a custom food** (Step 8), prefilled with whatever is known.
+  2. If it is not found, fetch `https://world.openfoodfacts.org/api/v2/product/{code}` and normalize the result (reusing the Step 2 normalizer). If it has full macros and a Hebrew name, save it with `source = OFF` and return it (otherwise `db:prune-foods` would delete it later).
+  3. If Open Food Facts doesn't have it, or it lacks macros or a Hebrew name, offer to **create a custom food** (Step 8), prefilled with whatever is known.
 - The camera needs HTTPS. For local phone testing, use `next dev --experimental-https` and open your LAN IP.
 
 **Done when:** on a real phone, scanning a seeded product opens its detail page, and an unseeded product is fetched and saved.
@@ -207,7 +212,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 ### Step 11 — Polish & quality
 
 - Loading, empty and error states (`loading.tsx`, `error.tsx`), plus optimistic UI on log, edit and delete.
-- Accessibility pass, dark mode, and `next/image` remote patterns for `images.openfoodfacts.org`.
+- Accessibility pass and dark mode.
 - Playwright E2E tests: sign in → search → build a meal → log it → see stats.
 
 ### Step 12 — PWA

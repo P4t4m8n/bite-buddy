@@ -18,13 +18,13 @@ describe("roundNutrient", () => {
 });
 
 describe("formatNutrient", () => {
-  it("adds units and shows unknown values as a dash", () => {
-    expect(formatNutrient("kcal", 535.4)).toBe("535 kcal");
-    expect(formatNutrient("protein", 3.57)).toBe("3.6 g");
+  it("adds Hebrew units and shows unknown values as a dash", () => {
+    expect(formatNutrient("kcal", 535.4)).toBe("535 קק״ל");
+    expect(formatNutrient("protein", 3.57)).toBe("3.6 ג׳");
     expect(formatNutrient("sugar", null)).toBe("–");
   });
 
   it("shows sodium in milligrams", () => {
-    expect(formatNutrient("sodium", 0.5714)).toBe("571 mg");
+    expect(formatNutrient("sodium", 0.5714)).toBe("571 מ״ג");
   });
 });

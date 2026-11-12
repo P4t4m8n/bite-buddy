@@ -42,7 +42,7 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        aria-label="Account menu"
+        aria-label="תפריט חשבון"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
@@ -56,7 +56,7 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
         <div
           id={menuId}
           role="menu"
-          className="absolute right-0 mt-2 w-60 rounded-xl border border-black/10 bg-background p-2 shadow-lg dark:border-white/10"
+          className="absolute end-0 mt-2 w-60 rounded-xl border border-black/10 bg-background p-2 shadow-lg dark:border-white/10"
         >
           <div className="px-2 py-1.5">
             <p className="truncate text-sm font-medium">{name}</p>
@@ -68,10 +68,10 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
             role="menuitem"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm hover:bg-foreground/5 disabled:opacity-60"
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-start text-sm hover:bg-foreground/5 disabled:opacity-60"
           >
             <LogOut aria-hidden className="size-4" />
-            {signingOut ? "Signing out…" : "Sign out"}
+            {signingOut ? "מתנתק…" : "התנתקות"}
           </button>
         </div>
       ) : null}

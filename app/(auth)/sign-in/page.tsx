@@ -1,12 +1,15 @@
-import { Salad } from "lucide-react";
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { GoogleSignInButton } from "@/components/google-sign-in-button";
+import { Salad } from "lucide-react";
+
 import { safeCallbackUrl } from "@/lib/auth/callback-url";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
-export const metadata: Metadata = { title: "Sign in" };
+import GoogleSignInButton from "@/components/google-sign-in-button";
+
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "התחברות" };
 
 export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
   return (
@@ -14,9 +17,9 @@ export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
       <span className="flex size-14 items-center justify-center rounded-2xl bg-brand/10">
         <Salad aria-hidden className="size-8 text-brand" />
       </span>
-      <h1 className="mt-4 text-2xl font-semibold tracking-tight">Welcome to Bite Buddy</h1>
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight">ברוכים הבאים ל־Bite Buddy</h1>
       <p className="mt-2 text-sm text-foreground/60">
-        Scan and search foods, build meals and track your weekly macros.
+        סורקים ומחפשים מוצרים, בונים ארוחות ועוקבים אחרי המאקרו השבועי.
       </p>
 
       <div className="mt-8 w-full">

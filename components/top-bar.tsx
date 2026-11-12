@@ -28,7 +28,7 @@ async function CurrentUserMenu() {
   if (!user) {
     return (
       <Link href="/sign-in" className="text-sm font-medium text-brand">
-        Sign in
+        התחברות
       </Link>
     );
   }

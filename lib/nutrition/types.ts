@@ -1,3 +1,5 @@
+import { FoodSource, FoodUnit } from "@/generated/prisma/client";
+
 /** Nutrients the app stores per food and per log entry. */
 export const NUTRIENT_KEYS = [
   "kcal",
@@ -38,3 +40,31 @@ export type FoodNutrition = {
 };
 
 export type MacroSplit = { protein: number; carbs: number; fat: number };
+
+export type Food = {
+  id: string;
+  barcode: string | null;
+  name: string;
+  brands: string[];
+  categories: string[];
+  imageUrl: string | null;
+  unit: FoodUnit;
+  packageAmount: number | null;
+  kcal100: number | null;
+  protein100: number | null;
+  carbs100: number | null;
+  fat100: number | null;
+  sugar100: number | null;
+  fiber100: number | null;
+  satFat100: number | null;
+  salt100: number | null;
+  sodium100: number | null;
+  hasNutrition: boolean;
+  nutritionGrade: string | null;
+  novaGroup: number | null;
+  allergens: string[];
+  source: FoodSource;
+  createdById: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};

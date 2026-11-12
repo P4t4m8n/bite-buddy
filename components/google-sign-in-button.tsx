@@ -9,7 +9,7 @@ type GoogleSignInButtonProps = {
   initialError?: boolean;
 };
 
-export function GoogleSignInButton({
+export default function GoogleSignInButton({
   callbackUrl = "/",
   disabled = false,
   initialError = false,
@@ -58,11 +58,11 @@ export function GoogleSignInButton({
             d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"
           />
         </svg>
-        {pending ? "Redirecting…" : "Continue with Google"}
+        {pending ? "מעביר ל־Google…" : "המשך עם Google"}
       </button>
       {failed ? (
         <p role="alert" className="text-sm text-red-600">
-          Sign-in failed. Please try again.
+          ההתחברות נכשלה. נסו שוב.
         </p>
       ) : null}
     </div>
