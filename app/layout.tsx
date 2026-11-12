@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Heebo } from "next/font/google";
+
+import ServiceWorkerRegister from "@/components/pwa/service-worker-register";
+
 import "./globals.css";
 
 // Geist has no Hebrew glyphs; Heebo covers Hebrew and Latin.
@@ -11,6 +14,9 @@ const heebo = Heebo({
 export const metadata: Metadata = {
   title: { default: "Bite Buddy", template: "%s · Bite Buddy" },
   description: "סורקים, מחפשים ועוקבים אחרי האוכל והמאקרו השבועי.",
+  applicationName: "Bite Buddy",
+  appleWebApp: { capable: true, title: "Bite Buddy", statusBarStyle: "default" },
+  icons: { apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -26,7 +32,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="he" dir="rtl" className={`${heebo.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <ServiceWorkerRegister />
+      </body>
     </html>
   );
 }

@@ -23,6 +23,7 @@
     "db:seed": "prisma db seed",
     "db:prune-foods": "tsx prisma/prune-foods.ts",
     "seed:clean": "tsx prisma/clean-seed-file.ts",
+    "icons": "tsx scripts/generate-icons.mts",
     "db:studio": "prisma studio"
   },
   "dependencies": {

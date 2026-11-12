@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth/current-user";
 import { getUserSettings } from "@/lib/user/settings";
 
 import { PageHeader } from "@/components/page-header";
+import InstallApp from "@/components/pwa/install-app";
 import GoalsForm from "@/components/settings/goals-form";
 import WeekStartSetting from "@/components/settings/week-start-setting";
 import MealEditorSkeleton from "@/components/skeletons/mealEditorSkeleton";
@@ -30,6 +31,7 @@ const SettingsLoader = async () => {
     <div className="space-y-8">
       <GoalsForm goals={settings.goals} />
       <WeekStartSetting value={settings.weekStartsOn} />
+      <InstallApp />
       <p className="text-xs text-foreground/60">אזור זמן: {settings.timezone}</p>
     </div>
   );

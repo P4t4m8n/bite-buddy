@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { Avatar } from "@/components/avatar";
+import { clearUserCache } from "@/components/pwa/service-worker-register";
 import { authClient } from "@/lib/auth/client";
 
 type UserMenuProps = { name: string; email: string; image: string | null };
@@ -19,6 +20,8 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
   const handleSignOut = async () => {
     setSigningOut(true);
     await authClient.signOut();
+    // Cached pages hold this user's diary and meals.
+    await clearUserCache();
     router.push("/sign-in");
     router.refresh();
   };

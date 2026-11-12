@@ -19,8 +19,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except the auth API, the sign-in page and static assets requires a session.
+  // Everything except the auth API, the sign-in and offline pages, the PWA files
+  // (service worker, manifest, icons) and static assets requires a session.
   matcher: [
-    "/((?!api/auth|sign-in|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)",
+    "/((?!api/auth|sign-in|offline|sw\\.js|manifest\\.webmanifest|icons/|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)",
   ],
 };
