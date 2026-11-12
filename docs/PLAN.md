@@ -212,6 +212,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
   - **Trend**: the last 8–12 weeks of average kcal and macros.
   - **Insights**: top foods by calories, the number of days on target, and the logging streak.
 - Aggregate with SQL (`date_trunc('week', eatenAt AT TIME ZONE tz)`). The week starts on the user's `weekStartsOn` setting.
+- Built differently: entries for the needed range (8 trend weeks, 120 days for the streak) are loaded once and grouped by local day in pure, tested JS (`lib/stats/aggregate.ts`) instead of SQL; the data per user is small. Averages count only days with entries. "On target" means within ±10% of the calorie goal. `/settings` (from the user menu) holds goals (`PUT /api/me/goals`) with a Mifflin-St Jeor helper (protein 1.8 g/kg, fat 25%), and the week start. `/stats?week=` shows any past week.
 
 **Done when:** the charts match the hand-calculated totals for a seeded test week.
 

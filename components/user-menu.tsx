@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { Avatar } from "@/components/avatar";
@@ -63,6 +64,15 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
             <p className="truncate text-xs text-foreground/60">{email}</p>
           </div>
           <hr className="my-1 border-black/10 dark:border-white/10" />
+          <Link
+            href="/settings"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-start text-sm hover:bg-foreground/5"
+          >
+            <Settings aria-hidden className="size-4" />
+            הגדרות ויעדים
+          </Link>
           <button
             type="button"
             role="menuitem"

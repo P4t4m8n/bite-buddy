@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { blockProductImages, denyCamera, signedOut } from "./support/helpers";
+import { blockProductImages, denyCamera, expectSettled, signedOut } from "./support/helpers";
 import { TEST_USER, withDb } from "./support/test-user";
 
 // Visual regression snapshots. Update baselines after intended UI changes with
@@ -16,6 +16,7 @@ test.describe("signed out", () => {
   test("sign-in page", async ({ page }) => {
     await page.goto("/sign-in");
     await expect(page.getByRole("button", { name: "המשך עם Google" })).toBeEnabled();
+    await expectSettled(page);
     await expect(page).toHaveScreenshot("sign-in.png");
   });
 });
@@ -23,6 +24,7 @@ test.describe("signed out", () => {
 test("search results", async ({ page }) => {
   await page.goto("/search?q=קוטג");
   await expect(page.getByRole("link", { name: /קוטג' 9%/ })).toBeVisible();
+  await expectSettled(page);
   await expect(page).toHaveScreenshot("search-results.png");
 });
 
@@ -30,6 +32,7 @@ test("food page", async ({ page }) => {
   await page.goto("/search?q=קוטג");
   await page.getByRole("link", { name: /קוטג' 9%/ }).click();
   await expect(page.getByRole("row", { name: /קלוריות/ })).toBeVisible();
+  await expectSettled(page);
   await expect(page).toHaveScreenshot("food.png");
 });
 
@@ -38,6 +41,7 @@ test("scan page without a camera", async ({ page }) => {
   await page.goto("/scan");
   await expect(page.getByText("אין הרשאה להשתמש במצלמה", { exact: false })).toBeVisible();
   await expect(page.getByLabel("הקלדת ברקוד")).toBeVisible();
+  await expectSettled(page);
   await expect(page).toHaveScreenshot("scan.png");
 });
 
@@ -59,12 +63,14 @@ test.describe("meals", () => {
   test("meals list", async ({ page }) => {
     await page.goto("/meals");
     await expect(page.getByRole("link", { name: /ארוחת בוקר/ })).toBeVisible();
+    await expectSettled(page);
     await expect(page).toHaveScreenshot("meals.png");
   });
 
   test("meal editor", async ({ page }) => {
     await page.goto(`/meals/${mealId}`);
     await expect(page.getByLabel("שם הארוחה")).toHaveValue("ארוחת בוקר");
+    await expectSettled(page);
     await expect(page).toHaveScreenshot("meal-editor.png", { fullPage: true });
   });
 });
@@ -72,6 +78,7 @@ test.describe("meals", () => {
 test("new food form", async ({ page }) => {
   await page.goto("/foods/new?name=" + encodeURIComponent("חומוס"));
   await expect(page.getByLabel("שם המוצר")).toHaveValue("חומוס");
+  await expectSettled(page);
   await expect(page).toHaveScreenshot("new-food.png", { fullPage: true });
 });
 
@@ -92,5 +99,38 @@ test("diary with entries", async ({ page, request }) => {
   }
   await page.goto("/");
   await expect(page.getByRole("region", { name: "ארוחת בוקר" })).toContainText("256 קק״ל");
+  await expectSettled(page);
   await expect(page).toHaveScreenshot("diary.png", { fullPage: true });
+});
+
+test.describe("goals and stats", () => {
+  test.beforeEach(async ({ request }) => {
+    await withDb(async (client) => {
+      await client.query('DELETE FROM "LogEntry" WHERE "userId" = $1', [TEST_USER.id]);
+      await client.query(`UPDATE "User" SET "weekStartsOn" = 'SUNDAY' WHERE id = $1`, [
+        TEST_USER.id,
+      ]);
+    });
+    await request.put("/api/me/goals", {
+      data: { kcal: 2000, proteinG: 120, carbsG: 220, fatG: 70 },
+    });
+  });
+
+  test("settings page", async ({ page }) => {
+    await page.goto("/settings");
+    await expect(page.getByLabel("קלוריות")).toHaveValue("2000");
+    await expectSettled(page);
+    await expect(page).toHaveScreenshot("settings.png", { fullPage: true });
+  });
+
+  test("stats page", async ({ page }) => {
+    await page.goto("/stats");
+    await expect(page.getByRole("img", { name: "קלוריות לפי יום" })).toBeVisible();
+    // The week range and weekday labels change with the date, so only the layout is compared.
+    await expectSettled(page);
+    await expect(page).toHaveScreenshot("stats.png", {
+      fullPage: true,
+      mask: [page.getByRole("navigation", { name: "בחירת שבוע" }), page.getByRole("img")],
+    });
+  });
 });

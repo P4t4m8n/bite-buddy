@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 /**
  * Open Food Facts images are slow and change over time. Blocking them makes the
@@ -8,6 +8,12 @@ export const blockProductImages = (page: Page) =>
   page.route("https://images.openfoodfacts.org/**", (route) => route.abort());
 
 export const signedOut = { storageState: { cookies: [], origins: [] } };
+
+/** Waits until no loading skeletons are left, so screenshots never catch a Suspense fallback. */
+export const expectSettled = async (page: Page) => {
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator(".animate-pulse")).toHaveCount(0);
+};
 
 /**
  * Headless browsers have no camera, and what getUserMedia does without one differs
