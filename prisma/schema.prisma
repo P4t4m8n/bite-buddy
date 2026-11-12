@@ -38,20 +38,22 @@ enum MealType {
   SNACK
 }
 
-// ─── Users ───────────────────────────────────────────────────────────────────
-// Auth.js adapter fields (name, email, emailVerified, image) are included now;
-// Account and Session are added in Step 3.
+// ─── Users & auth ────────────────────────────────────────────────────────────
+// User, Session, Account and Verification follow the Better Auth core schema
+// (checked with `npx auth@1.7.22 generate`). Extra app settings live on User.
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
+  id            String  @id @default(cuid())
+  name          String
+  email         String  @unique
+  emailVerified Boolean @default(false)
   image         String?
 
   timezone     String    @default("UTC")
   weekStartsOn WeekStart @default(SUNDAY)
 
+  sessions    Session[]
+  accounts    Account[]
   goals       UserGoals?
   meals       Meal[]
   logEntries  LogEntry[]
@@ -59,6 +61,55 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+/// A login method linked to a user (here: Google).
+model Account {
+  id                    String    @id
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String // the user's id at the provider
+  providerId            String // "google"
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+/// Short-lived values such as OAuth state.
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([identifier])
 }
 
 model UserGoals {

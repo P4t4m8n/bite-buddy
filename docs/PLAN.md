@@ -10,10 +10,10 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 | Concern    | Choice                                                                                                                 |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router, Server Components, Server Actions), React 19, TypeScript                                       |
+| Framework  | Next.js 16 (App Router, Server Components for reads, API route handlers for writes), React 19, TypeScript              |
 | Styling    | Tailwind CSS 4                                                                                                         |
 | Database   | PostgreSQL (local via Docker) + Prisma ORM                                                                             |
-| Auth       | Auth.js v5 (`next-auth@5`) + Prisma adapter: Google sign-in only                                                       |
+| Auth       | Better Auth 1.7 (stable) + its Prisma adapter: Google sign-in only                                                     |
 | Food data  | `seed/foodItems.json` (14,367 Open Food Facts products), plus an on-demand Open Food Facts lookup for unknown barcodes |
 | Scanning   | Barcode only: native `BarcodeDetector`, with `@zxing/browser` as the fallback                                          |
 | Validation | Zod                                                                                                                    |
@@ -57,7 +57,7 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 ## Data model (draft)
 
 ```
-User / Account / Session                       ← Auth.js Prisma adapter
+User / Session / Account / Verification       ← Better Auth core schema
 User           (+ timezone, weekStartsOn (SUNDAY|MONDAY))
 UserGoals      userId, kcal, proteinG, carbsG, fatG
 
@@ -117,11 +117,11 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 ### Step 3 — Authentication
 
-- Auth.js v5 with the Prisma adapter and the Google provider (create an OAuth client in Google Cloud Console, with redirect URI `http://localhost:3000/api/auth/callback/google`).
-- Add `auth.ts`, `app/api/auth/[...nextauth]/route.ts`, and `proxy.ts` to protect app routes.
-- Add a sign-in page, sign-out, and a user menu.
-- Add a `TopBar` server component in `app/(root)/layout.tsx`: the logo, plus the user's avatar read with `await auth()` and wrapped in `<Suspense>` (needed because `cacheComponents` is on). Only the `UserMenu` dropdown is a client component. Page titles and page actions stay in each page's `PageHeader` (a server component).
-- Add server helper `requireUser()` for Server Actions and pages.
+- Better Auth with its Prisma adapter and the Google provider (create an OAuth client in Google Cloud Console, with redirect URI `http://localhost:3000/api/auth/callback/google`). Sessions are stored in the database, with a 5-minute signed cookie cache so most reads skip the database.
+- Add `lib/auth/server.ts`, `lib/auth/client.ts`, `app/api/auth/[...all]/route.ts`, and `proxy.ts`. The proxy only checks that the session cookie exists (no database call) and redirects pages to `/sign-in` or returns 401 for `/api/*`.
+- Add a sign-in page, sign-out, and a user menu. Sign-in and sign-out run in the browser through `authClient`, which calls the `/api/auth/*` route handlers (no Server Actions).
+- Add a `TopBar` server component in `app/(root)/layout.tsx`: the logo, plus the user's avatar read with `getCurrentUser()` and wrapped in `<Suspense>` (needed because `cacheComponents` is on). Only the `UserMenu` dropdown is a client component. Page titles and page actions stay in each page's `PageHeader` (a server component).
+- Add server helpers `getCurrentUser()` and `requireUser()` (`lib/auth/current-user.ts`) for pages and API route handlers.
 
 **Done when:** you can sign in with Google, protected pages redirect, and the session persists.
 
@@ -171,7 +171,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 - Show live **per-ingredient nutrients** and **meal totals**, with a macro split donut.
 - A **Private / Public toggle** on each meal (private by default).
 - Public meals: anyone signed in can view them and **Save a copy** (sets `copiedFromId`). Only the owner can edit or delete.
-- Use Server Actions for create, update, delete and toggle, with Zod validation and ownership checks.
+- Use API route handlers (`app/api/meals/...`) for create, update, delete and toggle, with Zod validation and ownership checks.
 
 **Done when:** you can build "Oatmeal + PB + milk (ml)", see correct per-item and total nutrients, and the meal persists. A public meal is visible to a second user and a private one isn't.
 
@@ -216,7 +216,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 ### Step 13 — Deploy (optional)
 
 - A hosted Postgres database (for example Neon or Azure Database for PostgreSQL), plus Vercel or Azure App Service.
-- Run the migrations and seed in CI, and set the environment secrets (`AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `DATABASE_URL`). Add the production callback URL to the Google OAuth client.
+- Run the migrations and seed in CI, and set the environment secrets (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `DATABASE_URL`). Add the production callback URL to the Google OAuth client.
 
 ---
 

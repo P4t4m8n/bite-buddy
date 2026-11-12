@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   // The default bottom-left badge covers the bottom navigation.
   devIndicators: { position: "top-right" },
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "lh3.googleusercontent.com" }],
+  },
   partialPrefetching: true,
   turbopack: {
     rules: {
