@@ -101,7 +101,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 ### Step 1 — Database + Prisma
 
-- Add `docker-compose.yml` (Postgres 16), plus `prisma` and `@prisma/client`.
+- Add `docker-compose.yml` (Postgres 16 on host port **5433**, because the local Windows PostgreSQL 18 service already uses 5432), plus Prisma **7.10.1** (pinned: npm's `latest` tag for `prisma` points at an 8.0 RC). Prisma 7 uses `prisma.config.ts`, the `@prisma/adapter-pg` driver adapter, and a generated client in `generated/prisma` (gitignored, rebuilt on `postinstall`).
 - Write the schema above, without the auth tables for now. Enable the `pg_trgm` extension and add the trigram index in a migration.
 - Add `lib/db.ts` (a hot-reload-safe singleton).
 
@@ -111,7 +111,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 - Add `lib/food/normalize-seed.ts`, a pure function that maps a raw item to `Food`. It is unit tested and covers: missing nutrients, image selection, quantity parsing, g/ml detection and array flattening.
 - `prisma/seed.ts` reads the JSON, normalizes it and inserts it with `createMany` in batches of about 1,000 (`skipDuplicates`). It is idempotent.
-- Add the `"prisma": { "seed": ... }` config and an `npm run db:seed` script.
+- Add the seed command to `migrations.seed` in `prisma.config.ts` (Prisma 7 no longer reads it from `package.json`), plus an `npm run db:seed` script.
 
 **Done when:** the seed inserts 14,367 rows, re-running it adds none, and the normalizer tests pass.
 
@@ -120,6 +120,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 - Auth.js v5 with the Prisma adapter and the Google provider (create an OAuth client in Google Cloud Console, with redirect URI `http://localhost:3000/api/auth/callback/google`).
 - Add `auth.ts`, `app/api/auth/[...nextauth]/route.ts`, and `proxy.ts` to protect app routes.
 - Add a sign-in page, sign-out, and a user menu.
+- Add a `TopBar` server component in `app/(root)/layout.tsx`: the logo, plus the user's avatar read with `await auth()` and wrapped in `<Suspense>` (needed because `cacheComponents` is on). Only the `UserMenu` dropdown is a client component. Page titles and page actions stay in each page's `PageHeader` (a server component).
 - Add server helper `requireUser()` for Server Actions and pages.
 
 **Done when:** you can sign in with Google, protected pages redirect, and the session persists.

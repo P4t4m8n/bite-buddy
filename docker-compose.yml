@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: bitebuddy-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bitebuddy
+      POSTGRES_PASSWORD: bitebuddy
+      POSTGRES_DB: bitebuddy
+    # Host port 5433 because a local Windows PostgreSQL service already uses 5432.
+    ports:
+      - "5433:5432"
+    volumes:
+      - bitebuddy-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bitebuddy -d bitebuddy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  bitebuddy-db-data:

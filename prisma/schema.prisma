@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum WeekStart {
+  SUNDAY
+  MONDAY
+}
+
+/// Nutrients are stored per 100 of this unit.
+enum FoodUnit {
+  G
+  ML
+}
+
+enum FoodSource {
+  SEED // seed/foodItems.json
+  OFF // fetched from Open Food Facts on a barcode miss
+  USER // created by a user
+}
+
+enum Visibility {
+  PRIVATE
+  PUBLIC
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+// Auth.js adapter fields (name, email, emailVerified, image) are included now;
+// Account and Session are added in Step 3.
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  timezone     String    @default("UTC")
+  weekStartsOn WeekStart @default(SUNDAY)
+
+  goals       UserGoals?
+  meals       Meal[]
+  logEntries  LogEntry[]
+  customFoods Food[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserGoals {
+  userId   String @id
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kcal     Int
+  proteinG Int
+  carbsG   Int
+  fatG     Int
+
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Foods ───────────────────────────────────────────────────────────────────
+// Nutrient columns are per 100 g or 100 ml (see `unit`). null means unknown, not 0.
+
+model Food {
+  id         String   @id @default(cuid())
+  barcode    String?  @unique
+  name       String
+  brands     String[]
+  categories String[]
+  imageUrl   String?
+
+  unit          FoodUnit @default(G)
+  packageAmount Float? // parsed from the product quantity, in `unit`
+
+  kcal100    Float?
+  protein100 Float?
+  carbs100   Float?
+  fat100     Float?
+  sugar100   Float?
+  fiber100   Float?
+  satFat100  Float?
+  salt100    Float?
+  sodium100  Float?
+
+  hasNutrition   Boolean @default(false)
+  nutritionGrade String?
+  novaGroup      Int?
+  allergens      String[]
+
+  source      FoodSource
+  createdById String?
+  createdBy   User?      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  mealItems  MealItem[]
+  logEntries LogEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Fuzzy name search; requires the pg_trgm extension (created in the init migration).
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Food_name_trgm_idx")
+  @@index([createdById])
+}
+
+// ─── Meals ───────────────────────────────────────────────────────────────────
+
+model Meal {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  notes      String?
+  visibility Visibility @default(PRIVATE)
+
+  copiedFromId String?
+  copiedFrom   Meal?   @relation("MealCopies", fields: [copiedFromId], references: [id], onDelete: SetNull)
+  copies       Meal[]  @relation("MealCopies")
+
+  items      MealItem[]
+  logEntries LogEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([visibility])
+}
+
+model MealItem {
+  id       String @id @default(cuid())
+  mealId   String
+  meal     Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  foodId   String
+  food     Food   @relation(fields: [foodId], references: [id], onDelete: Restrict)
+  amount   Float // in the food's unit (g or ml)
+  position Int    @default(0)
+
+  @@index([mealId])
+  @@index([foodId])
+}
+
+// ─── Diary ───────────────────────────────────────────────────────────────────
+// Nutrients are a snapshot taken when logging, so later edits to a food or meal
+// don't change past days or weekly stats.
+
+model LogEntry {
+  id       String   @id @default(cuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eatenAt  DateTime @db.Timestamptz(3)
+  mealType MealType
+
+  foodId   String?
+  food     Food?   @relation(fields: [foodId], references: [id], onDelete: SetNull)
+  mealId   String?
+  meal     Meal?   @relation(fields: [mealId], references: [id], onDelete: SetNull)
+  amount   Float? // when logging a food, in the food's unit
+  servings Float? // when logging a meal
+
+  name    String // label snapshot, kept if the food or meal is deleted
+  kcal    Float?
+  protein Float?
+  carbs   Float?
+  fat     Float?
+  fiber   Float?
+  sugar   Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, eatenAt])
+  @@index([foodId])
+  @@index([mealId])
+}
