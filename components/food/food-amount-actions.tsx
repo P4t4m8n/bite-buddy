@@ -1,10 +1,10 @@
 "use client";
 
-import { ClipboardPlus } from "lucide-react";
 import { useState } from "react";
 
 import { displayAmount } from "@/lib/nutrition/amount";
 
+import LogButton from "@/components/diary/log-button";
 import FoodAmountCalculator from "@/components/food/food-amount-calculator";
 import AddToMealButton from "@/components/meals/add-to-meal-button";
 
@@ -45,16 +45,9 @@ export default function FoodAmountActions({
       {children}
 
       <div className="grid grid-cols-2 gap-3">
-        {/* Enabled in Step 9 (diary). */}
-        <button
-          type="button"
-          disabled
-          title="בקרוב"
-          className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
-        >
-          <ClipboardPlus aria-hidden className="size-4" />
-          הוספה ליומן
-        </button>
+        <LogButton
+          target={{ kind: "food", foodId, name: foodName, amount: displayAmount(input), unit }}
+        />
         <AddToMealButton
           foodId={foodId}
           foodName={foodName}

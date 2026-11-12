@@ -74,3 +74,23 @@ test("new food form", async ({ page }) => {
   await expect(page.getByLabel("שם המוצר")).toHaveValue("חומוס");
   await expect(page).toHaveScreenshot("new-food.png", { fullPage: true });
 });
+
+test("diary with entries", async ({ page, request }) => {
+  await withDb((client) =>
+    client.query('DELETE FROM "LogEntry" WHERE "userId" = $1', [TEST_USER.id]),
+  );
+  const search = await request.get("/api/foods?q=" + encodeURIComponent("קוטג' 9%"));
+  const [food] = ((await search.json()) as { items: { id: string }[] }).items;
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(new Date());
+  for (const [mealType, amount] of [
+    ["BREAKFAST", 200],
+    ["SNACK", 50],
+  ] as const) {
+    await request.post("/api/log", {
+      data: { date, mealType, timezone: "Asia/Jerusalem", foodId: food.id, amount },
+    });
+  }
+  await page.goto("/");
+  await expect(page.getByRole("region", { name: "ארוחת בוקר" })).toContainText("256 קק״ל");
+  await expect(page).toHaveScreenshot("diary.png", { fullPage: true });
+});

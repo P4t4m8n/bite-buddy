@@ -3,6 +3,7 @@ import { UNIT_LABELS } from "@/lib/nutrition/format";
 
 import { FoodImage } from "@/components/food/food-image";
 import CopyMealButton from "@/components/meals/copy-meal-button";
+import LogButton from "@/components/diary/log-button";
 import MacroLine from "@/components/meals/macro-line";
 import MealTotals from "@/components/meals/meal-totals";
 
@@ -21,6 +22,10 @@ export default function MealView({ meal }: { meal: MealDetail }) {
       </header>
 
       <CopyMealButton mealId={meal.id} />
+      <LogButton
+        target={{ kind: "meal", mealId: meal.id, name: meal.name }}
+        className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 font-medium disabled:opacity-50"
+      />
 
       <section aria-labelledby="meal-items-heading" className="space-y-3">
         <h2 id="meal-items-heading" className="font-semibold">

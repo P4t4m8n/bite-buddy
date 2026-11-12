@@ -15,6 +15,7 @@ import {
 import { mealNutrition } from "@/lib/nutrition/nutrients";
 
 import FoodPicker from "@/components/meals/food-picker";
+import LogButton from "@/components/diary/log-button";
 import MealItemRow, { moveButtonId } from "@/components/meals/meal-item-row";
 import MealTotals from "@/components/meals/meal-totals";
 import VisibilitySwitch from "@/components/meals/visibility-switch";
@@ -182,127 +183,138 @@ export default function MealEditor({ meal }: MealEditorProps) {
   };
 
   return (
-    <form onSubmit={save} noValidate className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        {meal ? "עריכת ארוחה" : "ארוחה חדשה"}
-      </h1>
+    <>
+      <form onSubmit={save} noValidate className="space-y-6">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {meal ? "עריכת ארוחה" : "ארוחה חדשה"}
+        </h1>
 
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="meal-name" className="text-sm font-medium">
-            שם הארוחה
-          </label>
-          <input
-            id="meal-name"
-            type="text"
-            value={name}
-            maxLength={MEAL_NAME_MAX}
-            onChange={(event) => update({ name: event.target.value })}
-            placeholder="לדוגמה: דייסת שיבולת שועל"
-            autoComplete="off"
-            required
-            className="mt-1 h-11 w-full rounded-lg border border-foreground/15 bg-background px-3 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none"
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="meal-name" className="text-sm font-medium">
+              שם הארוחה
+            </label>
+            <input
+              id="meal-name"
+              type="text"
+              value={name}
+              maxLength={MEAL_NAME_MAX}
+              onChange={(event) => update({ name: event.target.value })}
+              placeholder="לדוגמה: דייסת שיבולת שועל"
+              autoComplete="off"
+              required
+              className="mt-1 h-11 w-full rounded-lg border border-foreground/15 bg-background px-3 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none"
+            />
+          </div>
+          <div>
+            <label htmlFor="meal-notes" className="text-sm font-medium">
+              הערות <span className="font-normal text-foreground/60">(לא חובה)</span>
+            </label>
+            <textarea
+              id="meal-notes"
+              value={notes}
+              maxLength={MEAL_NOTES_MAX}
+              onChange={(event) => update({ notes: event.target.value })}
+              rows={2}
+              className="mt-1 w-full rounded-lg border border-foreground/15 bg-background px-3 py-2 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none"
+            />
+          </div>
+          <VisibilitySwitch
+            isPublic={visibility === "PUBLIC"}
+            onChange={(isPublic) => update({ visibility: isPublic ? "PUBLIC" : "PRIVATE" })}
           />
         </div>
-        <div>
-          <label htmlFor="meal-notes" className="text-sm font-medium">
-            הערות <span className="font-normal text-foreground/60">(לא חובה)</span>
-          </label>
-          <textarea
-            id="meal-notes"
-            value={notes}
-            maxLength={MEAL_NOTES_MAX}
-            onChange={(event) => update({ notes: event.target.value })}
-            rows={2}
-            className="mt-1 w-full rounded-lg border border-foreground/15 bg-background px-3 py-2 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none"
-          />
-        </div>
-        <VisibilitySwitch
-          isPublic={visibility === "PUBLIC"}
-          onChange={(isPublic) => update({ visibility: isPublic ? "PUBLIC" : "PRIVATE" })}
-        />
-      </div>
 
-      <section aria-labelledby="meal-items-heading" className="space-y-3">
-        <h2 id="meal-items-heading" className="font-semibold">
-          מוצרים בארוחה
-        </h2>
-        {items.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-foreground/15 p-4 text-center text-sm text-foreground/60">
-            עוד לא נוספו מוצרים. חפשו מוצר כדי להוסיף אותו.
-          </p>
-        ) : (
-          <ol className="space-y-2">
-            {items.map((item, index) => (
-              <MealItemRow
-                key={item.key}
-                itemKey={item.key}
-                food={item.food}
-                amountInput={item.amountInput}
-                invalid={!isSavableAmount(parseAmountInput(item.amountInput))}
-                nutrients={nutrition.items[index]}
-                isFirst={index === 0}
-                isLast={index === items.length - 1}
-                onAmountChange={(value) =>
-                  update({
-                    items: items.map((it) =>
-                      it.key === item.key ? { ...it, amountInput: value } : it,
-                    ),
-                  })
-                }
-                onMove={(offset) => moveFood(index, offset)}
-                onRemove={() =>
-                  setItems(
-                    items.filter((it) => it.key !== item.key),
-                    `${item.food.name} הוסר מהארוחה`,
-                  )
-                }
-              />
-            ))}
-          </ol>
-        )}
-        <p role="status" className="sr-only">
-          {announcement}
-        </p>
-      </section>
-
-      <FoodPicker onAdd={addFood} showScanLink={Boolean(meal) && !dirty} />
-
-      <MealTotals totals={nutrition.totals} totalAmount={nutrition.totalAmount} />
-
-      <div className="space-y-3">
-        {error ? (
-          <p role="alert" className="text-sm text-red-600">
-            {error}
-          </p>
-        ) : null}
-        <p role="status" className="text-sm text-foreground/60">
-          {justSaved && !dirty ? "הארוחה נשמרה." : dirty && meal ? "יש שינויים שלא נשמרו." : ""}
-        </p>
-        <button
-          type="submit"
-          disabled={busy !== null}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
-        >
-          {busy === "saving" ? (
-            <LoaderCircle aria-hidden className="size-4 animate-spin" />
+        <section aria-labelledby="meal-items-heading" className="space-y-3">
+          <h2 id="meal-items-heading" className="font-semibold">
+            מוצרים בארוחה
+          </h2>
+          {items.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-foreground/15 p-4 text-center text-sm text-foreground/60">
+              עוד לא נוספו מוצרים. חפשו מוצר כדי להוסיף אותו.
+            </p>
           ) : (
-            <Save aria-hidden className="size-4" />
+            <ol className="space-y-2">
+              {items.map((item, index) => (
+                <MealItemRow
+                  key={item.key}
+                  itemKey={item.key}
+                  food={item.food}
+                  amountInput={item.amountInput}
+                  invalid={!isSavableAmount(parseAmountInput(item.amountInput))}
+                  nutrients={nutrition.items[index]}
+                  isFirst={index === 0}
+                  isLast={index === items.length - 1}
+                  onAmountChange={(value) =>
+                    update({
+                      items: items.map((it) =>
+                        it.key === item.key ? { ...it, amountInput: value } : it,
+                      ),
+                    })
+                  }
+                  onMove={(offset) => moveFood(index, offset)}
+                  onRemove={() =>
+                    setItems(
+                      items.filter((it) => it.key !== item.key),
+                      `${item.food.name} הוסר מהארוחה`,
+                    )
+                  }
+                />
+              ))}
+            </ol>
           )}
-          {meal ? "שמירת השינויים" : "שמירת הארוחה"}
-        </button>
-        {meal ? (
+          <p role="status" className="sr-only">
+            {announcement}
+          </p>
+        </section>
+
+        <FoodPicker onAdd={addFood} showScanLink={Boolean(meal) && !dirty} />
+
+        <MealTotals totals={nutrition.totals} totalAmount={nutrition.totalAmount} />
+
+        <div className="space-y-3">
+          {error ? (
+            <p role="alert" className="text-sm text-red-600">
+              {error}
+            </p>
+          ) : null}
+          <p role="status" className="text-sm text-foreground/60">
+            {justSaved && !dirty ? "הארוחה נשמרה." : dirty && meal ? "יש שינויים שלא נשמרו." : ""}
+          </p>
           <button
-            type="button"
-            onClick={remove}
+            type="submit"
             disabled={busy !== null}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-full font-medium text-red-600 hover:bg-red-500/10 disabled:opacity-50"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand font-medium text-white disabled:opacity-50"
           >
-            <Trash2 aria-hidden className="size-4" />
-            מחיקת הארוחה
+            {busy === "saving" ? (
+              <LoaderCircle aria-hidden className="size-4 animate-spin" />
+            ) : (
+              <Save aria-hidden className="size-4" />
+            )}
+            {meal ? "שמירת השינויים" : "שמירת הארוחה"}
           </button>
-        ) : null}
-      </div>
-    </form>
+          {meal ? (
+            <button
+              type="button"
+              onClick={remove}
+              disabled={busy !== null}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full font-medium text-red-600 hover:bg-red-500/10 disabled:opacity-50"
+            >
+              <Trash2 aria-hidden className="size-4" />
+              מחיקת הארוחה
+            </button>
+          ) : null}
+        </div>
+      </form>
+      {/* Outside the form: the dialog has its own form, and logging uses the saved meal. */}
+      {meal && !dirty ? (
+        <div className="mt-3">
+          <LogButton
+            target={{ kind: "meal", mealId: meal.id, name: meal.name }}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-foreground/15 font-medium disabled:opacity-50"
+          />
+        </div>
+      ) : null}
+    </>
   );
 }

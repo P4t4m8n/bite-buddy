@@ -200,6 +200,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 - You can log a single food (g or ml) or a saved meal (servings). Nutrients are **snapshotted** into `LogEntry`.
 - Show daily totals compared with goals (progress rings), and allow editing or deleting entries.
 - Time zones: store `eatenAt` as UTC and group days in the user's time zone (saved on `User`, detected from the browser).
+- Built: the home page `/` (`?date=YYYY-MM-DD` for other days), `POST /api/log`, `PATCH/DELETE /api/log/[id]`, `PATCH /api/me` (time zone, week start). A "הוספה ליומן" dialog (day, meal, servings for meals) on the food page and meal pages. Progress bars instead of rings. Editing an amount scales the stored snapshot, so it stays right after the food or meal changes. Entries logged for today use the current time; other days use local noon.
 
 **Done when:** a logged food or meal appears under the correct day and section, and the totals are correct.
 
