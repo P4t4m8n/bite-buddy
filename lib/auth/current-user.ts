@@ -20,8 +20,8 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 });
 
 /** For pages: redirects to sign-in when there is no valid session. */
-export async function requireUser(): Promise<CurrentUser> {
+export const requireUser = async (): Promise<CurrentUser> => {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
   return user;
-}
+};
