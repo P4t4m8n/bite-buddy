@@ -5,3 +5,5 @@ next-env.d.ts
 seed
 generated
 prisma/migrations
+playwright-report
+test-results

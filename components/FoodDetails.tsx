@@ -3,7 +3,7 @@ import { FoodImage } from "./food/food-image";
 import { translateAllergen } from "@/lib/food/allergens";
 import { UNIT_LABELS } from "@/lib/nutrition/format";
 import { ClipboardPlus, UtensilsCrossed } from "lucide-react";
-import  FoodAmountCalculator  from "./food/food-amount-calculator";
+import FoodAmountCalculator from "./food/food-amount-calculator";
 import { NutriScoreBadge, NovaBadge } from "./food/food-badges";
 
 type FoodDetailsProps = {
