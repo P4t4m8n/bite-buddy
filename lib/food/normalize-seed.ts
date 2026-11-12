@@ -174,6 +174,8 @@ function kcal(item: RawSeedFood): number | null {
 }
 
 const NUTRITION_GRADES = new Set(["a", "b", "c", "d", "e"]);
+// Salt is sodium chloride: 1 g sodium ≈ 2.5 g salt.
+const SALT_PER_SODIUM = 2.5;
 
 // ─── Normalize ───────────────────────────────────────────────────────────────
 
@@ -185,6 +187,10 @@ export function normalizeSeedFood(item: RawSeedFood): Prisma.FoodCreateManyInput
   const protein100 = nutrient(item.proteins, MAX_GRAMS_PER_100);
   const carbs100 = nutrient(item.carbohydrates, MAX_GRAMS_PER_100);
   const fat100 = nutrient(item.fat, MAX_GRAMS_PER_100);
+  const salt100 = nutrient(item.salt, MAX_GRAMS_PER_100);
+  const sodium100 =
+    nutrient(item.sodium, MAX_GRAMS_PER_100) ??
+    (salt100 === null ? null : salt100 / SALT_PER_SODIUM);
   const grade = item.nutritionGrade?.toLowerCase();
 
   return {
@@ -202,8 +208,8 @@ export function normalizeSeedFood(item: RawSeedFood): Prisma.FoodCreateManyInput
     sugar100: nutrient(item.sugars, MAX_GRAMS_PER_100),
     fiber100: nutrient(item.fiber, MAX_GRAMS_PER_100),
     satFat100: nutrient(item.saturatedFat, MAX_GRAMS_PER_100),
-    salt100: nutrient(item.salt, MAX_GRAMS_PER_100),
-    sodium100: nutrient(item.sodium, MAX_GRAMS_PER_100),
+    salt100,
+    sodium100,
     hasNutrition: [kcal100, protein100, carbs100, fat100].every((v) => v !== null),
     nutritionGrade: grade && NUTRITION_GRADES.has(grade) ? grade : null,
     novaGroup: typeof item.novaGroup === "number" ? item.novaGroup : null,

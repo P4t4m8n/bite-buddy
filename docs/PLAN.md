@@ -34,7 +34,7 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 - 14,367 items, all with a unique `barcode`.
 - Nutrients (`calories`, `proteins`, `carbohydrates`, `fat`, `sugars`, `fiber`, `saturatedFat`, `salt`, `sodium`) are Open Food Facts values **per 100 g/ml**. `salt` and `sodium` are in grams.
-- **Only 6,238 items (43%) have all of kcal, protein, carbs and fat** after cleaning. We keep the rest, mark them `hasNutrition = false`, and let users fill in the missing values (Step 8). Impossible values (over 900 kcal or over 100 g of a macro per 100) are dropped, and kcal is derived from kJ when only kJ is given.
+- **Only 6,238 items (43%) have all of kcal, protein, carbs and fat** after cleaning. Only those are seeded; the rest are skipped, and `npm run db:prune-foods` removes incomplete shared foods already in the DB. New foods are added as needed (barcode lookups and custom foods). Impossible values (over 900 kcal or over 100 g of a macro per 100) are dropped, kcal is derived from kJ when only kJ is given, and sodium from salt (÷ 2.5) when only salt is given.
 - `servingSize` is unreliable (for example, `15128`), so we don't trust it. `quantity` is free text in several languages and units (for example, `"5.5 oz (158 g)"`, `"6 x 30 g"`, `"500 גרם"`, `"0,514kg"`); we parse a package amount from it where we can (2,606 items).
 - `brand`, `categories`, `allergens`, `labels`, `ingredients` and `traces` are arrays of `{ name }`. We store them as `string[]`.
 - `images` lists many sizes. We keep the first `front_*.400.jpg` (or the first `*.400.jpg`) as `imageUrl`.
@@ -44,13 +44,13 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 ## Decisions
 
-| Topic            | Decision                                                                                                                                             |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| What users track | Macros only for now: kcal, protein, carbs and fat. Logs also store fiber and sugar, so we can add them later without losing past data.               |
-| Units            | Each food is either grams (`G`) or millilitres (`ML`), with nutrients per 100 of that unit. For meal totals, 1 ml counts as 1 g.                     |
-| Meal sharing     | Each meal has a **Private / Public toggle** (private by default). Anyone signed in can browse public meals and save a copy. Only the owner can edit. |
-| Week start       | A user setting, Sunday by default, changeable to Monday.                                                                                             |
-| Sign-in          | Google only. No email sign-in, so no email service is needed. Email sign-in can be added later.                                                      |
+| Topic            | Decision                                                                                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What users track | Goals are macros only for now: kcal, protein, carbs and fat. Foods, meal totals and logs also track fiber, sugar, saturated fat and sodium (shown in mg). |
+| Units            | Each food is either grams (`G`) or millilitres (`ML`), with nutrients per 100 of that unit. For meal totals, 1 ml counts as 1 g.                          |
+| Meal sharing     | Each meal has a **Private / Public toggle** (private by default). Anyone signed in can browse public meals and save a copy. Only the owner can edit.      |
+| Week start       | A user setting, Sunday by default, changeable to Monday.                                                                                                  |
+| Sign-in          | Google only. No email sign-in, so no email service is needed. Email sign-in can be added later.                                                           |
 
 ---
 
@@ -72,7 +72,8 @@ MealItem       id, mealId, foodId, amount                   ← in the food's un
 
 LogEntry       id, userId, eatenAt (timestamptz), mealType (BREAKFAST|LUNCH|DINNER|SNACK),
                foodId? | mealId?, amount? | servings?,
-               kcal, protein, carbs, fat, fiber, sugar      ← snapshot at log time
+               kcal, protein, carbs, fat, fiber, sugar,
+               satFat, sodium                               ← snapshot at log time
 ```
 
 **Why snapshot?** If a food or meal is edited later, past logs and weekly stats should stay the same.
@@ -110,10 +111,11 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 ### Step 2 — Seed script
 
 - Add `lib/food/normalize-seed.ts`, a pure function that maps a raw item to `Food`. It is unit tested and covers: missing nutrients, image selection, quantity parsing, g/ml detection and array flattening.
-- `prisma/seed.ts` reads the JSON, normalizes it and inserts it with `createMany` in batches of about 1,000 (`skipDuplicates`). It is idempotent.
+- `prisma/seed.ts` reads the JSON, normalizes it, skips foods without full macros, and inserts the rest with `createMany` in batches of about 1,000 (`skipDuplicates`). It is idempotent.
+- `prisma/prune-foods.ts` (`npm run db:prune-foods [-- --dry-run]`) deletes shared (seed / Open Food Facts) foods without full macros, except foods used in saved meals.
 - Add the seed command to `migrations.seed` in `prisma.config.ts` (Prisma 7 no longer reads it from `package.json`), plus an `npm run db:seed` script.
 
-**Done when:** the seed inserts 14,367 rows, re-running it adds none, and the normalizer tests pass.
+**Done when:** the seed inserts the 6,238 complete foods, re-running it adds none, and the normalizer tests pass.
 
 ### Step 3 — Authentication
 
@@ -130,18 +132,18 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 - `lib/nutrition/`:
   - `scale(per100, amount)` scales nutrients to an amount in g or ml.
   - `sumNutrients(items[])` adds up a list of items.
-  - `mealTotals(meal)` gives totals for a whole meal.
-  - `perServing(meal, servings)` gives totals for a number of servings.
+  - `mealNutrition(items)` gives per-item nutrients, meal totals and the total amount.
+  - `multiply(nutrients, servings)` gives totals for a number of servings.
   - `macroSplit(n)` gives the percentage of calories from protein, carbs and fat (4/4/9 kcal per gram).
-  - Missing-value rules: treat as `null` (unknown), not `0`, and show "incomplete" in the UI.
-  - A rounding helper for display only.
+  - Missing-value rules: a single food keeps `null` (unknown), not `0`. A total sums the known values and lists the nutrient in `incomplete` when some items lack it (the UI shows "incomplete"); it is `null` only when no item has it.
+  - `roundNutrient` / `formatNutrient` for display only (`format.ts`).
 - Add types such as `Nutrients` and `NutrientKey`.
 
 **Done when:** there is full unit-test coverage of the edge cases (0 g, missing values, many items).
 
 ### Step 5 — Food search + food detail
 
-- Add `lib/food/search.ts`: trigram plus `ILIKE` search on name and brand, ranked, and paginated (20 per page). It can filter to `hasNutrition`.
+- Add `lib/food/search.ts`: trigram plus `ILIKE` search on name and brand, ranked, and paginated (20 per page).
 - Search page: a debounced input (state stored in the URL `?q=`) that renders results on the server.
 - Food detail page `/food/[id]`:
   - A nutrition table per 100 g or 100 ml.
@@ -158,8 +160,8 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
   - Includes a torch toggle, debounces duplicate reads, and offers manual barcode entry as a fallback.
 - Lookup flow `GET /api/foods/barcode/[code]`:
   1. Look the barcode up in the DB.
-  2. If it is not found, fetch `https://world.openfoodfacts.org/api/v2/product/{code}`, normalize the result (reusing the Step 2 normalizer), save it with `source = OFF`, and return it.
-  3. If Open Food Facts doesn't have it either, offer to **create a custom food**.
+  2. If it is not found, fetch `https://world.openfoodfacts.org/api/v2/product/{code}` and normalize the result (reusing the Step 2 normalizer). If it has full macros, save it with `source = OFF` and return it.
+  3. If Open Food Facts doesn't have it, or it lacks macros, offer to **create a custom food** (Step 8), prefilled with whatever is known.
 - The camera needs HTTPS. For local phone testing, use `next dev --experimental-https` and open your LAN IP.
 
 **Done when:** on a real phone, scanning a seeded product opens its detail page, and an unseeded product is fetched and saved.
@@ -175,12 +177,12 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 **Done when:** you can build "Oatmeal + PB + milk (ml)", see correct per-item and total nutrients, and the meal persists. A public meal is visible to a second user and a private one isn't.
 
-### Step 8 — Custom foods / complete missing data
+### Step 8 — Custom foods
 
-- A form to create a food (name, optional barcode, unit g/ml, nutrients per 100 of that unit) with `source = USER`. It is visible only to its creator.
-- For seeded items with no nutrition, offer **Add nutrition info**. This creates a user override and doesn't change the shared seed row.
+- A form to create a food (name, optional barcode, unit g/ml, nutrients per 100 of that unit) with `source = USER`. kcal, protein, carbs and fat are required; fiber, sugar, saturated fat and sodium are optional. It is visible only to its creator.
+- When a scanned barcode is missing or incomplete on Open Food Facts, open this form prefilled with whatever is known.
 
-**Done when:** a food with no data can be completed and then used in meals and logs.
+**Done when:** a custom food can be created (also from a failed scan) and then used in meals and logs.
 
 ### Step 9 — Food diary (logging)
 
@@ -222,6 +224,6 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 ## Later (not now)
 
-- Goals and stats for fiber, sugar and sodium (the data is already stored).
+- Goals for fiber, sugar, saturated fat and sodium (the data is already tracked).
 - Household measures ("1 cup") and oz.
 - Email sign-in (needs a domain or a dedicated sender mailbox).

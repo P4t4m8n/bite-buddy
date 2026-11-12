@@ -133,6 +133,11 @@ describe("normalizeSeedFood", () => {
     expect(normalizeSeedFood({ ...base, energyKj: 2240 }).kcal100).toBe(535.4);
   });
 
+  it("derives sodium from salt when sodium is missing", () => {
+    expect(normalizeSeedFood({ ...base, salt: 1.5 }).sodium100).toBeCloseTo(0.6);
+    expect(normalizeSeedFood({ ...base, salt: 1.5, sodium: 0.5 }).sodium100).toBe(0.5);
+  });
+
   it("stores only real Nutri-Score grades", () => {
     expect(normalizeSeedFood({ ...base, nutritionGrade: "unknown" }).nutritionGrade).toBeNull();
     expect(

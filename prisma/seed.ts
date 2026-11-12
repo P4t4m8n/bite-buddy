@@ -9,7 +9,8 @@ const BATCH_SIZE = 1000;
 
 async function main() {
   const raw: RawSeedFood[] = JSON.parse(readFileSync(SEED_FILE, "utf8"));
-  const foods = raw.map(normalizeSeedFood);
+  // Foods without kcal, protein, carbs and fat aren't useful for tracking, so they are skipped.
+  const foods = raw.map(normalizeSeedFood).filter((food) => food.hasNutrition);
 
   let inserted = 0;
   for (let i = 0; i < foods.length; i += BATCH_SIZE) {
@@ -22,10 +23,9 @@ async function main() {
   }
 
   const total = await db.food.count({ where: { source: "SEED" } });
-  const complete = foods.filter((f) => f.hasNutrition).length;
   console.log(
-    `Seed foods: ${foods.length} in file, ${inserted} inserted, ${foods.length - inserted} skipped. ` +
-      `${total} seed foods in DB (${complete} with full macros).`,
+    `Seed foods: ${raw.length} in file, ${raw.length - foods.length} skipped without full macros, ` +
+      `${inserted} inserted, ${foods.length - inserted} already in DB. ${total} seed foods in DB.`,
   );
 }
 

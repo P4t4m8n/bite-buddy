@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "LogEntry" ADD COLUMN     "satFat" DOUBLE PRECISION,
+ADD COLUMN     "sodium" DOUBLE PRECISION;
