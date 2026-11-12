@@ -190,6 +190,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 - A form to create a food (name, optional barcode, unit g/ml, nutrients per 100 of that unit) with `source = USER`. kcal, protein, carbs and fat are required; fiber, sugar, saturated fat and sodium are optional. It is visible only to its creator.
 - When a scanned barcode is missing or incomplete on Open Food Facts, open this form prefilled with whatever is known.
+- Built: `/foods/new` (prefill from the URL), `POST /api/foods`, and a "לא מצאתם? הוספת מוצר חדש" link on search. Sodium is entered in mg. Values are checked (protein + carbs + fat ≤ 100, sugar ≤ carbs, saturated fat ≤ fat). A barcode the user can already see returns 409 with a link to that food; a barcode held by another user's private food is dropped from the new food. Editing or deleting custom foods is not built yet.
 
 **Done when:** a custom food can be created (also from a failed scan) and then used in meals and logs.
 

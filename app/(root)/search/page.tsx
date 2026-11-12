@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { FoodListItem } from "@/components/food/food-list-item";
@@ -38,7 +39,12 @@ const SearchResults = async ({ searchParams }: Pick<PageProps<"/search">, "searc
   const { items, hasMore } = await searchFoods({ query: q, page, userId: user.id });
 
   if (items.length === 0) {
-    return <Hint>לא נמצאו מוצרים עבור ״{q}״.</Hint>;
+    return (
+      <>
+        <Hint>לא נמצאו מוצרים עבור ״{q}״.</Hint>
+        <NewFoodLink query={q} />
+      </>
+    );
   }
 
   return (
@@ -48,6 +54,7 @@ const SearchResults = async ({ searchParams }: Pick<PageProps<"/search">, "searc
           <FoodListItem key={food.id} food={food} />
         ))}
       </ul>
+      {hasMore ? null : <NewFoodLink query={q} />}
       {page > 1 || hasMore ? (
         <nav aria-label="עמודים" className="mt-4 flex items-center justify-between text-sm">
           {page > 1 ? (
@@ -73,6 +80,16 @@ const SearchResults = async ({ searchParams }: Pick<PageProps<"/search">, "searc
 
 const Hint = ({ children }: { children: React.ReactNode }) => (
   <p className="py-8 text-center text-sm text-foreground/60">{children}</p>
+);
+
+const NewFoodLink = ({ query }: { query: string }) => (
+  <Link
+    href={`/foods/new?${new URLSearchParams({ name: query })}`}
+    className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-foreground/20 p-3 text-sm font-medium text-brand hover:bg-brand/5"
+  >
+    <Plus aria-hidden className="size-4" />
+    לא מצאתם? הוספת מוצר חדש
+  </Link>
 );
 
 const ResultsSkeleton = () => (

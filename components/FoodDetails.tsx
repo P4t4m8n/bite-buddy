@@ -49,6 +49,11 @@ const Header = ({ food }: { food: Food }) => (
         </p>
       ) : null}
       <div className="mt-2 flex flex-wrap gap-1.5">
+        {food.source === "USER" ? (
+          <span className="inline-flex items-center rounded-full bg-brand/10 px-2.5 py-1 text-xs font-semibold text-brand">
+            מוצר אישי
+          </span>
+        ) : null}
         {food.nutritionGrade ? <NutriScoreBadge grade={food.nutritionGrade} /> : null}
         {food.novaGroup ? <NovaBadge group={food.novaGroup} /> : null}
       </div>

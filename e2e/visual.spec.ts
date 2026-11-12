@@ -68,3 +68,9 @@ test.describe("meals", () => {
     await expect(page).toHaveScreenshot("meal-editor.png", { fullPage: true });
   });
 });
+
+test("new food form", async ({ page }) => {
+  await page.goto("/foods/new?name=" + encodeURIComponent("חומוס"));
+  await expect(page.getByLabel("שם המוצר")).toHaveValue("חומוס");
+  await expect(page).toHaveScreenshot("new-food.png", { fullPage: true });
+});
