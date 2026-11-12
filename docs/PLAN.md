@@ -8,20 +8,21 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 ## Stack (decided)
 
-| Concern | Choice |
-| --- | --- |
-| Framework | Next.js 16 (App Router, Server Components, Server Actions), React 19, TypeScript |
-| Styling | Tailwind CSS 4 |
-| Database | PostgreSQL (local via Docker) + Prisma ORM |
-| Auth | Auth.js v5 (`next-auth@5`) + Prisma adapter: Google sign-in only |
-| Food data | `seed/foodItems.json` (14,367 Open Food Facts products), plus an on-demand Open Food Facts lookup for unknown barcodes |
-| Scanning | Barcode only: native `BarcodeDetector`, with `@zxing/browser` as the fallback |
-| Validation | Zod |
-| Charts | Recharts |
-| Tests | Vitest (domain logic), Playwright (key flows, later) |
-| PWA | Last step |
+| Concern    | Choice                                                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components, Server Actions), React 19, TypeScript                                       |
+| Styling    | Tailwind CSS 4                                                                                                         |
+| Database   | PostgreSQL (local via Docker) + Prisma ORM                                                                             |
+| Auth       | Auth.js v5 (`next-auth@5`) + Prisma adapter: Google sign-in only                                                       |
+| Food data  | `seed/foodItems.json` (14,367 Open Food Facts products), plus an on-demand Open Food Facts lookup for unknown barcodes |
+| Scanning   | Barcode only: native `BarcodeDetector`, with `@zxing/browser` as the fallback                                          |
+| Validation | Zod                                                                                                                    |
+| Charts     | Recharts                                                                                                               |
+| Tests      | Vitest (domain logic), Playwright (key flows, later)                                                                   |
+| PWA        | Last step                                                                                                              |
 
 ### Next.js 16 changes to keep in mind
+
 - `middleware.ts` is now **`proxy.ts`** (export `proxy`, Node runtime only).
 - `params`, `searchParams`, `cookies()` and `headers()` are **async** and must be awaited.
 - Turbopack is the default bundler.
@@ -43,13 +44,13 @@ Each step below is small enough for one branch or PR. Each one ends with a **Don
 
 ## Decisions
 
-| Topic | Decision |
-| --- | --- |
-| What users track | Macros only for now: kcal, protein, carbs and fat. Logs also store fiber and sugar, so we can add them later without losing past data. |
-| Units | Each food is either grams (`G`) or millilitres (`ML`), with nutrients per 100 of that unit. For meal totals, 1 ml counts as 1 g. |
-| Meal sharing | Each meal has a **Private / Public toggle** (private by default). Anyone signed in can browse public meals and save a copy. Only the owner can edit. |
-| Week start | A user setting, Sunday by default, changeable to Monday. |
-| Sign-in | Google only. No email sign-in, so no email service is needed. Email sign-in can be added later. |
+| Topic            | Decision                                                                                                                                             |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What users track | Macros only for now: kcal, protein, carbs and fat. Logs also store fiber and sugar, so we can add them later without losing past data.               |
+| Units            | Each food is either grams (`G`) or millilitres (`ML`), with nutrients per 100 of that unit. For meal totals, 1 ml counts as 1 g.                     |
+| Meal sharing     | Each meal has a **Private / Public toggle** (private by default). Anyone signed in can browse public meals and save a copy. Only the owner can edit. |
+| Week start       | A user setting, Sunday by default, changeable to Monday.                                                                                             |
+| Sign-in          | Google only. No email sign-in, so no email service is needed. Email sign-in can be added later.                                                      |
 
 ---
 
@@ -83,6 +84,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 ## Steps
 
 ### Step 0 — Project foundations
+
 - Add Prettier, Vitest, a `.env.example`, and path aliases (`@/`).
 - Folder layout:
   ```
@@ -98,6 +100,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** `npm run lint`, `npm test` and `npm run build` pass, and the app shell shows on mobile width.
 
 ### Step 1 — Database + Prisma
+
 - Add `docker-compose.yml` (Postgres 16), plus `prisma` and `@prisma/client`.
 - Write the schema above, without the auth tables for now. Enable the `pg_trgm` extension and add the trigram index in a migration.
 - Add `lib/db.ts` (a hot-reload-safe singleton).
@@ -105,6 +108,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** `npx prisma migrate dev` creates the tables, and Prisma Studio shows them.
 
 ### Step 2 — Seed script
+
 - Add `lib/food/normalize-seed.ts`, a pure function that maps a raw item to `Food`. It is unit tested and covers: missing nutrients, image selection, quantity parsing, g/ml detection and array flattening.
 - `prisma/seed.ts` reads the JSON, normalizes it and inserts it with `createMany` in batches of about 1,000 (`skipDuplicates`). It is idempotent.
 - Add the `"prisma": { "seed": ... }` config and an `npm run db:seed` script.
@@ -112,6 +116,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** the seed inserts 14,367 rows, re-running it adds none, and the normalizer tests pass.
 
 ### Step 3 — Authentication
+
 - Auth.js v5 with the Prisma adapter and the Google provider (create an OAuth client in Google Cloud Console, with redirect URI `http://localhost:3000/api/auth/callback/google`).
 - Add `auth.ts`, `app/api/auth/[...nextauth]/route.ts`, and `proxy.ts` to protect app routes.
 - Add a sign-in page, sign-out, and a user menu.
@@ -120,6 +125,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** you can sign in with Google, protected pages redirect, and the session persists.
 
 ### Step 4 — Nutrition domain logic (pure, tested)
+
 - `lib/nutrition/`:
   - `scale(per100, amount)` scales nutrients to an amount in g or ml.
   - `sumNutrients(items[])` adds up a list of items.
@@ -133,6 +139,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** there is full unit-test coverage of the edge cases (0 g, missing values, many items).
 
 ### Step 5 — Food search + food detail
+
 - Add `lib/food/search.ts`: trigram plus `ILIKE` search on name and brand, ranked, and paginated (20 per page). It can filter to `hasNutrition`.
 - Search page: a debounced input (state stored in the URL `?q=`) that renders results on the server.
 - Food detail page `/food/[id]`:
@@ -144,6 +151,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** searching "peanut butter" returns relevant results quickly, and the detail page scales nutrients correctly.
 
 ### Step 6 — Barcode scanning
+
 - A client component `<BarcodeScanner>` that:
   - Uses the `getUserMedia` rear camera with `BarcodeDetector` (EAN-13, EAN-8, UPC-A/E) when the browser supports it, and falls back to `@zxing/browser` (iOS Safari needs this).
   - Includes a torch toggle, debounces duplicate reads, and offers manual barcode entry as a fallback.
@@ -156,6 +164,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** on a real phone, scanning a seeded product opens its detail page, and an unseeded product is fetched and saved.
 
 ### Step 7 — Meals (builder)
+
 - Pages: `/meals` (my meals), `/meals/new`, `/meals/[id]` (edit) and `/meals/public` (browse public meals).
 - Search or scan to add items, set the amount (g or ml) per item, and remove or reorder items.
 - Show live **per-ingredient nutrients** and **meal totals**, with a macro split donut.
@@ -166,12 +175,14 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** you can build "Oatmeal + PB + milk (ml)", see correct per-item and total nutrients, and the meal persists. A public meal is visible to a second user and a private one isn't.
 
 ### Step 8 — Custom foods / complete missing data
+
 - A form to create a food (name, optional barcode, unit g/ml, nutrients per 100 of that unit) with `source = USER`. It is visible only to its creator.
 - For seeded items with no nutrition, offer **Add nutrition info**. This creates a user override and doesn't change the shared seed row.
 
 **Done when:** a food with no data can be completed and then used in meals and logs.
 
 ### Step 9 — Food diary (logging)
+
 - `/today` (home) has a date switcher and sections for Breakfast, Lunch, Dinner and Snacks.
 - You can log a single food (g or ml) or a saved meal (servings). Nutrients are **snapshotted** into `LogEntry`.
 - Show daily totals compared with goals (progress rings), and allow editing or deleting entries.
@@ -180,6 +191,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** a logged food or meal appears under the correct day and section, and the totals are correct.
 
 ### Step 10 — Goals + weekly statistics
+
 - Settings: daily goals for kcal, protein, carbs and fat (macros only for now), and the week start day (Sunday by default). Include an optional helper that suggests targets from weight, height, age and activity (Mifflin-St Jeor).
 - `/stats`:
   - **This week**: a bar chart of daily calories against the goal line, a stacked bar of daily macros, and weekly totals and averages compared with targets.
@@ -190,21 +202,25 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 **Done when:** the charts match the hand-calculated totals for a seeded test week.
 
 ### Step 11 — Polish & quality
+
 - Loading, empty and error states (`loading.tsx`, `error.tsx`), plus optimistic UI on log, edit and delete.
 - Accessibility pass, dark mode, and `next/image` remote patterns for `images.openfoodfacts.org`.
 - Playwright E2E tests: sign in → search → build a meal → log it → see stats.
 
 ### Step 12 — PWA
+
 - `app/manifest.ts`, icons, a service worker for an offline app shell, and caching of recent searches and foods.
 - An install prompt, then a test of "Add to Home Screen" on Android and iOS.
 
 ### Step 13 — Deploy (optional)
+
 - A hosted Postgres database (for example Neon or Azure Database for PostgreSQL), plus Vercel or Azure App Service.
 - Run the migrations and seed in CI, and set the environment secrets (`AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `DATABASE_URL`). Add the production callback URL to the Google OAuth client.
 
 ---
 
 ## Later (not now)
+
 - Goals and stats for fiber, sugar and sodium (the data is already stored).
 - Household measures ("1 cup") and oz.
 - Email sign-in (needs a domain or a dedicated sender mailbox).

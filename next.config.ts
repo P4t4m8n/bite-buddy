@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     agentFeedback: true,
   },
   cacheComponents: true,
+  // The default bottom-left badge covers the bottom navigation.
+  devIndicators: { position: "top-right" },
   partialPrefetching: true,
   turbopack: {
     rules: {
