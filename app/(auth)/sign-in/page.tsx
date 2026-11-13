@@ -5,6 +5,7 @@ import { Salad } from "lucide-react";
 import { safeCallbackUrl } from "@/lib/auth/callback-url";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
+import DemoSignInButton from "@/components/demo-sign-in-button";
 import GoogleSignInButton from "@/components/google-sign-in-button";
 
 import type { Metadata } from "next";
@@ -24,7 +25,14 @@ export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
 
       <div className="mt-8 w-full">
         {/* searchParams and the session are request data, so they stream in. */}
-        <Suspense fallback={<GoogleSignInButton disabled />}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col gap-4">
+              <GoogleSignInButton disabled />
+              <DemoSignInButton disabled />
+            </div>
+          }
+        >
           <SignInForm searchParams={searchParams} />
         </Suspense>
       </div>
@@ -38,5 +46,10 @@ const SignInForm = async ({ searchParams }: Pick<PageProps<"/sign-in">, "searchP
 
   if (await getCurrentUser()) redirect(redirectTo);
 
-  return <GoogleSignInButton callbackUrl={redirectTo} initialError={Boolean(error)} />;
+  return (
+    <div className="flex flex-col gap-4">
+      <GoogleSignInButton callbackUrl={redirectTo} initialError={Boolean(error)} />
+      <DemoSignInButton callbackUrl={redirectTo} />
+    </div>
+  );
 };

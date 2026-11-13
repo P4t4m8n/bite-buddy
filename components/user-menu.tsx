@@ -8,7 +8,7 @@ import { Avatar } from "@/components/avatar";
 import { clearUserCache } from "@/components/pwa/service-worker-register";
 import { authClient } from "@/lib/auth/client";
 
-type UserMenuProps = { name: string; email: string; image: string | null };
+type UserMenuProps = { name: string; email: string | null; image: string | null };
 
 export function UserMenu({ name, email, image }: UserMenuProps) {
   const [open, setOpen] = useState(false);
@@ -64,7 +64,7 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
         >
           <div className="px-2 py-1.5">
             <p className="truncate text-sm font-medium">{name}</p>
-            <p className="truncate text-xs text-foreground/60">{email}</p>
+            {email ? <p className="truncate text-xs text-foreground/60">{email}</p> : null}
           </div>
           <hr className="my-1 border-black/10 dark:border-white/10" />
           <Link

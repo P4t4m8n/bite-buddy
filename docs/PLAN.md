@@ -243,6 +243,8 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 4. **Google Cloud Console:** add `https://<your-domain>/api/auth/callback/google` to the OAuth client's redirect URIs, and publish the consent screen (in "Testing" only listed users can sign in).
 5. **Check:** sign in, search, scan on a phone (HTTPS now works without extra flags), install the app, and log a meal.
 
+**Demo account:** the sign-in page also has a `כניסה למשתמש דמו` button for people who don't want to share their Google email or image. It signs everyone in to one shared user (`demo@bite-buddy.invalid`, created on first use by the Better Auth plugin in `lib/auth/demo-login.ts`), so they all see the same diary, goals and private meals. No setup needed in production.
+
 Preview deployments get the same variables only if you add them for "Preview". With the same database, a preview deploy would also run migrations on production, so give previews their own Neon branch or don't set the database variables for Preview.
 
 ---

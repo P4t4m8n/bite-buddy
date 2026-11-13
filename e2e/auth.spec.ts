@@ -12,6 +12,17 @@ test.describe("signed out", () => {
     await expect(page.getByRole("button", { name: "המשך עם Google" })).toBeEnabled();
   });
 
+  test("demo account signs in without Google and keeps the target", async ({ page }) => {
+    await page.goto("/meals");
+    await page.getByRole("button", { name: "כניסה למשתמש דמו" }).click();
+    await expect(page).toHaveURL(/\/meals$/);
+
+    await page.getByRole("button", { name: "תפריט חשבון" }).click();
+    const menu = page.getByRole("menu");
+    await expect(menu).toContainText("משתמש דמו");
+    await expect(menu).not.toContainText("@");
+  });
+
   test("API routes return 401 JSON", async ({ request }) => {
     const response = await request.get("/api/foods?q=חלב");
     expect(response.status()).toBe(401);

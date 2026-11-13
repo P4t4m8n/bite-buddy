@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { UserMenu } from "@/components/user-menu";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { DEMO_EMAIL } from "@/lib/auth/demo-login";
 
 export function TopBar() {
   return (
@@ -32,5 +33,7 @@ async function CurrentUserMenu() {
       </Link>
     );
   }
-  return <UserMenu name={user.name} email={user.email} image={user.image} />;
+  // The demo account's placeholder address means nothing to the people using it.
+  const email = user.email === DEMO_EMAIL ? null : user.email;
+  return <UserMenu name={user.name} email={email} image={user.image} />;
 }
