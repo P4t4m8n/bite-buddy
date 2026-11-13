@@ -1,6 +1,7 @@
 import type { RawSeedFood } from "@/lib/food/normalize-seed";
 
-export const OFF_USER_AGENT = "BiteBuddy/0.1 (local dev)";
+// Open Food Facts asks API clients to identify themselves with an app name, version and contact.
+export const OFF_USER_AGENT = "BiteBuddy/1.0 (+https://github.com/P4t4m8n/bite-buddy)";
 const OFF_TIMEOUT_MS = 8000;
 
 // Only the fields we map; `nutriments` can't be narrowed further in the v2 API.
