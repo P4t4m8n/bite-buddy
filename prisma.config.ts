@@ -10,6 +10,7 @@ export default defineConfig({
   datasource: {
     // Prisma CLI only (migrations, seed). Hosted Postgres like Neon needs the direct,
     // unpooled address for migrations; the app itself uses the pooled DATABASE_URL.
-    url: process.env.DIRECT_URL || env("DATABASE_URL"),
+    // DATABASE_URL_UNPOOLED is the name the Neon integration on Vercel uses.
+    url: process.env.DIRECT_URL || process.env.DATABASE_URL_UNPOOLED || env("DATABASE_URL"),
   },
 });

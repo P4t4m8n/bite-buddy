@@ -233,7 +233,7 @@ Search uses Postgres `pg_trgm` with a GIN index on `Food.name` for fast fuzzy ma
 
 - A hosted Postgres database (for example Neon or Azure Database for PostgreSQL), plus Vercel or Azure App Service.
 - Run the migrations and seed in CI, and set the environment secrets (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `DATABASE_URL`). Add the production callback URL to the Google OAuth client.
-- Prepared in code: Vercel runs `npm run vercel-build` (`prisma migrate deploy && next build`), so every deploy applies new migrations. The Prisma CLI uses `DIRECT_URL` when set (Neon's unpooled address); the app uses the pooled `DATABASE_URL`. Node ≥ 22.12 is set in `engines`. `.github/workflows/ci.yml` runs format check, lint, typecheck, unit tests and build on each push (E2E needs a database and runs locally).
+- Prepared in code: Vercel runs `npm run vercel-build` (`prisma migrate deploy && next build`), so every deploy applies new migrations. The Prisma CLI uses `DIRECT_URL` or `DATABASE_URL_UNPOOLED` when set (Neon's unpooled address; the Neon integration on Vercel creates `DATABASE_URL_UNPOOLED` and `DATABASE_URL` automatically); the app uses the pooled `DATABASE_URL`. Node ≥ 22.12 is set in `engines`. `.github/workflows/ci.yml` runs format check, lint, typecheck, unit tests and build on each push (E2E needs a database and runs locally).
 
 **Checklist**
 
