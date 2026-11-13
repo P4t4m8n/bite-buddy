@@ -17,15 +17,21 @@ export const SearchInput = ({ label = "חיפוש מוצר או מותג" }: Sea
   const [isPending, startTransition] = useTransition();
 
   // Push the typed query into the URL (?q=) after a short pause; the server renders the results.
+  // Other params (e.g. the diary day) stay; the page number resets.
   useEffect(() => {
     const query = value.trim();
     if (query === urlQuery) return;
     const timer = setTimeout(() => {
-      const href = query ? `${pathname}?${new URLSearchParams({ q: query })}` : pathname;
+      const params = new URLSearchParams(searchParams);
+      params.delete("page");
+      if (query) params.set("q", query);
+      else params.delete("q");
+      const search = params.toString();
+      const href = search ? `${pathname}?${search}` : pathname;
       startTransition(() => router.replace(href, { scroll: false }));
     }, DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [value, urlQuery, pathname, router]);
+  }, [value, urlQuery, pathname, router, searchParams]);
 
   return (
     <div className="relative">

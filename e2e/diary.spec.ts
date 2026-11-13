@@ -96,6 +96,37 @@ test("log a saved meal by servings; the entry keeps its values when the meal cha
   await expect(dinner).toContainText("256 קק״ל");
 });
 
+test("add a saved meal from a diary section, for that section and day", async ({
+  page,
+  request,
+}) => {
+  const cottage = await findFood(request, "קוטג' 9%");
+  for (const name of ["קוטג' לערב", "שייק בוקר"]) {
+    await request.post("/api/meals", {
+      data: { name, items: [{ foodId: cottage.id, amount: 100 }] },
+    });
+  }
+  const yesterday = dateKey(-1);
+
+  await page.goto(`/?date=${yesterday}`);
+  await page.getByRole("link", { name: "הוספה לארוחת צהריים" }).click();
+  await expect(page).toHaveURL(new RegExp(`/diary/add\\?date=${yesterday}&meal=LUNCH$`));
+  await expect(page.getByRole("heading", { level: 1, name: "הוספה לארוחת צהריים" })).toBeVisible();
+  await expect(page.locator("p", { hasText: /^אתמול$/ })).toBeVisible();
+
+  // Searching keeps the day and the section in the URL.
+  await page.getByRole("searchbox", { name: "חיפוש ארוחה" }).fill("ערב");
+  await expect(page).toHaveURL(new RegExp(`date=${yesterday}&meal=LUNCH&q=`));
+  await expect(page.getByText("שייק בוקר")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "הוספת קוטג' לערב" }).click();
+  await expect(page).toHaveURL(new RegExp(`/\\?date=${yesterday}$`));
+  const lunch = section(page, "ארוחת צהריים");
+  await expect(lunch.getByRole("link", { name: "קוטג' לערב" })).toBeVisible();
+  await expect(lunch).toContainText("מנה אחת");
+  await expect(lunch).toContainText("128 קק״ל");
+});
+
 test("navigate between days", async ({ page, request }) => {
   const cottage = await findFood(request, "קוטג' 9%");
   const logged = await request.post("/api/log", {

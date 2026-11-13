@@ -47,6 +47,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 
     for (const [name, path] of [
       ["diary", () => "/"],
+      ["add to diary", () => "/diary/add?meal=LUNCH"],
       ["search", () => "/search?q=קוטג"],
       ["food", () => `/food/${foodId}`],
       ["meals", () => "/meals"],

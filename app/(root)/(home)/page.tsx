@@ -30,7 +30,7 @@ const DiaryLoader = async ({ searchParams }: Pick<PageProps<"/">, "searchParams"
       <div className="space-y-6">
         <DailySummary totals={day.totals} goals={day.goals} />
         {day.sections.map((section) => (
-          <MealSection key={section.mealType} section={section} />
+          <MealSection key={section.mealType} section={section} date={day.date} />
         ))}
       </div>
     </>

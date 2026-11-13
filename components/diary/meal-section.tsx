@@ -1,14 +1,18 @@
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
+import { addToDiaryHref } from "@/lib/diary/links";
 import { MEAL_TYPE_LABELS } from "@/lib/diary/schemas";
 import { roundNutrient } from "@/lib/nutrition/format";
 
 import LogEntryRow from "@/components/diary/log-entry-row";
 
+import type { DateKey } from "@/lib/diary/dates";
 import type { DiarySection } from "@/lib/diary/types";
 
-export default function MealSection({ section }: { section: DiarySection }) {
+type MealSectionProps = { section: DiarySection; date: DateKey };
+
+export default function MealSection({ section, date }: MealSectionProps) {
   const label = MEAL_TYPE_LABELS[section.mealType];
   const headingId = `section-${section.mealType}`;
   const kcal = section.totals.values.kcal;
@@ -37,7 +41,7 @@ export default function MealSection({ section }: { section: DiarySection }) {
       )}
 
       <Link
-        href="/search"
+        href={addToDiaryHref(date, section.mealType)}
         className="inline-flex items-center gap-1 text-sm font-medium text-brand"
         aria-label={`הוספה ל${label}`}
       >
