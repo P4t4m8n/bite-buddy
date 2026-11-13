@@ -5,7 +5,19 @@ import MealCard from "@/components/meals/meal-card";
 
 import type { MealSummary } from "@/lib/meals/types";
 
-export default function MyMealsList({ meals }: { meals: MealSummary[] }) {
+export default function MyMealsList({
+  meals,
+  query = "",
+}: {
+  meals: MealSummary[];
+  query?: string;
+}) {
+  if (meals.length === 0 && query) {
+    return (
+      <p className="py-8 text-center text-sm text-foreground/60">לא נמצאו ארוחות עבור ״{query}״.</p>
+    );
+  }
+
   if (meals.length === 0) {
     return (
       <div className="flex flex-col items-center rounded-2xl border border-dashed border-foreground/15 px-6 py-10 text-center">

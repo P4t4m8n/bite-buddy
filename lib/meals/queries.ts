@@ -39,6 +39,10 @@ const summarySelect = {
 
 type SummaryRow = Prisma.MealGetPayload<{ select: typeof summarySelect }>;
 
+/** Case-insensitive meal-name filter; an empty query matches every meal. */
+const nameFilter = (query: string): Prisma.MealWhereInput =>
+  query ? { name: { contains: query, mode: "insensitive" } } : {};
+
 const toSummary = (meal: SummaryRow): MealSummary => ({
   id: meal.id,
   name: meal.name,
@@ -48,9 +52,9 @@ const toSummary = (meal: SummaryRow): MealSummary => ({
 });
 
 /** The user's meals, most recently edited first. */
-export const listMyMeals = async (userId: string): Promise<MealSummary[]> => {
+export const listMyMeals = async (userId: string, query = ""): Promise<MealSummary[]> => {
   const meals = await db.meal.findMany({
-    where: { userId },
+    where: { userId, ...nameFilter(query) },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     select: summarySelect,
   });
@@ -68,10 +72,14 @@ export const listMyMealOptions = (userId: string): Promise<MealOption[]> =>
     .then((meals) => meals.map(({ id, name, _count }) => ({ id, name, itemCount: _count.items })));
 
 /** Public meals of other users, newest first. */
-export const listPublicMeals = async (userId: string, page: number): Promise<PublicMealsPage> => {
+export const listPublicMeals = async (
+  userId: string,
+  page: number,
+  query = "",
+): Promise<PublicMealsPage> => {
   // One extra row tells us whether there is a next page.
   const meals = await db.meal.findMany({
-    where: { visibility: "PUBLIC", userId: { not: userId } },
+    where: { visibility: "PUBLIC", userId: { not: userId }, ...nameFilter(query) },
     orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     skip: (page - 1) * PUBLIC_MEALS_PAGE_SIZE,
     take: PUBLIC_MEALS_PAGE_SIZE + 1,

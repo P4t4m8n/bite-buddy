@@ -11,6 +11,19 @@ const pageSchema = z.coerce.number().int().min(1).max(MAX_PAGE).catch(1);
 export const parsePageParam = (value: string | string[] | undefined): number =>
   pageSchema.parse(Array.isArray(value) ? value[0] : (value ?? 1));
 
+/** `?q=` from the URL for meal-name search: trimmed, at most one meal name long. */
+export const parseMealQuery = (value: string | string[] | undefined): string =>
+  (Array.isArray(value) ? value[0] : (value ?? "")).trim().slice(0, MEAL_NAME_MAX);
+
+/** Link to a page of public meals, keeping the search. */
+export const publicMealsHref = (page: number, query = ""): string => {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (page > 1) params.set("page", String(page));
+  const search = params.toString();
+  return search ? `/meals/public?${search}` : "/meals/public";
+};
+
 /** Name for a saved copy of a meal, shortened so it still fits MEAL_NAME_MAX. */
 export const copyMealName = (name: string): string => {
   const base = name

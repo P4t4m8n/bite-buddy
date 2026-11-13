@@ -127,6 +127,25 @@ test("add a food to a meal from the food page", async ({ page, request }) => {
   expect(meals.items.find((m) => m.name === "ארוחה קיימת")?.itemCount).toBe(1);
 });
 
+test("search filters my meals by name", async ({ page, request }) => {
+  await createMealViaApi(request, { name: "ארוחת בוקר" });
+  await createMealViaApi(request, { name: "ארוחת ערב" });
+
+  await page.goto("/meals");
+  const search = page.getByRole("searchbox", { name: "חיפוש ארוחה" });
+  await search.fill("בוקר");
+  await expect(page).toHaveURL(/\/meals\?q=/);
+  await expect(page.getByRole("link", { name: /ארוחת בוקר/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /ארוחת ערב/ })).toHaveCount(0);
+
+  await search.fill("פיצה");
+  await expect(page.getByText("לא נמצאו ארוחות עבור ״פיצה״.")).toBeVisible();
+
+  await search.fill("");
+  await expect(page).toHaveURL(/\/meals$/);
+  await expect(page.getByRole("link", { name: /ארוחת ערב/ })).toBeVisible();
+});
+
 test.describe("sharing with a second user", () => {
   test.afterAll(async () => {
     await withDb((client) => deleteUser(client, SECOND_USER));
@@ -153,6 +172,14 @@ test.describe("sharing with a second user", () => {
     const card = other.getByRole("link", { name: /ארוחה משותפת/ });
     await expect(card).toContainText(`מאת ${TEST_USER.name}`);
     await expect(other.getByText("ארוחה סודית")).toHaveCount(0);
+
+    const publicSearch = other.getByRole("searchbox", { name: "חיפוש ארוחה ציבורית" });
+    await publicSearch.fill("משותפת");
+    await expect(other).toHaveURL(/\/meals\/public\?q=/);
+    await expect(card).toBeVisible();
+    await publicSearch.fill("סודית");
+    await expect(other.getByText("לא נמצאו ארוחות ציבוריות עבור ״סודית״.")).toBeVisible();
+    await publicSearch.fill("משותפת");
 
     await card.click();
     await expect(other.getByText(`ארוחה ציבורית מאת ${TEST_USER.name}`)).toBeVisible();

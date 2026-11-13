@@ -6,7 +6,9 @@ import { useEffect, useState, useTransition } from "react";
 
 const DEBOUNCE_MS = 300;
 
-export const SearchInput = () => {
+type SearchInputProps = { label?: string };
+
+export const SearchInput = ({ label = "חיפוש מוצר או מותג" }: SearchInputProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -35,8 +37,8 @@ export const SearchInput = () => {
         type="search"
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        placeholder="חיפוש מוצר או מותג"
-        aria-label="חיפוש מוצר או מותג"
+        placeholder={label}
+        aria-label={label}
         autoComplete="off"
         enterKeyHint="search"
         className="h-12 w-full rounded-xl border border-foreground/15 bg-background ps-9 pe-10 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"

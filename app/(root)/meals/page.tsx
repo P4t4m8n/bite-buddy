@@ -3,17 +3,19 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { requireUser } from "@/lib/auth/current-user";
+import { parseMealQuery } from "@/lib/meals/helpers";
 import { listMyMeals } from "@/lib/meals/queries";
 
 import MyMealsList from "@/components/meals/my-meals-list";
 import { PageHeader } from "@/components/page-header";
+import { SearchInput } from "@/components/search/search-input";
 import MealListSkeleton from "@/components/skeletons/mealListSkeleton";
 
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "ארוחות" };
 
-export default function MealsPage() {
+export default function MealsPage({ searchParams }: PageProps<"/meals">) {
   return (
     <>
       <PageHeader
@@ -36,14 +38,23 @@ export default function MealsPage() {
         <Globe aria-hidden className="size-4 text-brand" />
         ארוחות ציבוריות של משתמשים אחרים
       </Link>
+      <div className="mb-4">
+        {/* The input reads the URL, so it renders on the client behind a boundary. */}
+        <Suspense fallback={<SearchInputSkeleton />}>
+          <SearchInput label="חיפוש ארוחה" />
+        </Suspense>
+      </div>
       <Suspense fallback={<MealListSkeleton />}>
-        <MyMealsLoader />
+        <MyMealsLoader searchParams={searchParams} />
       </Suspense>
     </>
   );
 }
 
-const MyMealsLoader = async () => {
+const MyMealsLoader = async ({ searchParams }: Pick<PageProps<"/meals">, "searchParams">) => {
+  const query = parseMealQuery((await searchParams).q);
   const user = await requireUser();
-  return <MyMealsList meals={await listMyMeals(user.id)} />;
+  return <MyMealsList meals={await listMyMeals(user.id, query)} query={query} />;
 };
+
+const SearchInputSkeleton = () => <div className="h-12 rounded-xl border border-foreground/15" />;

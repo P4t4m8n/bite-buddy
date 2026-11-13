@@ -4,9 +4,31 @@ import {
   copyMealName,
   itemCountLabel,
   moveItem,
+  parseMealQuery,
   parsePageParam,
+  publicMealsHref,
   withPositions,
 } from "@/lib/meals/helpers";
+
+describe("parseMealQuery", () => {
+  it("trims and takes the first value", () => {
+    expect(parseMealQuery("  בוקר ")).toBe("בוקר");
+    expect(parseMealQuery(["ערב", "בוקר"])).toBe("ערב");
+    expect(parseMealQuery(undefined)).toBe("");
+  });
+
+  it("caps the query at a meal name's length", () => {
+    expect(parseMealQuery("א".repeat(200))).toHaveLength(80);
+  });
+});
+
+describe("publicMealsHref", () => {
+  it("keeps the search and drops page 1", () => {
+    expect(publicMealsHref(1)).toBe("/meals/public");
+    expect(publicMealsHref(2)).toBe("/meals/public?page=2");
+    expect(publicMealsHref(3, "סלט")).toBe(`/meals/public?q=${encodeURIComponent("סלט")}&page=3`);
+  });
+});
 
 describe("copyMealName", () => {
   it("adds the copy suffix", () => {
