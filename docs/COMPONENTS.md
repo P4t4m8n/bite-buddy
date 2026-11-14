@@ -1,6 +1,6 @@
 # Component hierarchy
 
-One tree per feature, from the route down to the smallest component, so you can follow each part of the app.
+One tree per feature, from the route down to the smallest component, so you can follow each part of the app. The same trees as diagrams: [COMPONENTS-DIAGRAMS.md](./COMPONENTS-DIAGRAMS.md).
 
 **Legend**
 
