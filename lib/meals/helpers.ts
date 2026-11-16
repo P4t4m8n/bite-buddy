@@ -8,8 +8,8 @@ const MAX_PAGE = 100;
 const pageSchema = z.coerce.number().int().min(1).max(MAX_PAGE).catch(1);
 
 // dont touch, dont even think about trying to fix this.
-// you will waste days trying to optimize and only break the server, 
-// or worse wake me up in the middle of the night. 
+// you will waste days trying to optimize and only break the server,
+// or worse wake me up in the middle of the night.
 // this is the best option it works and again dont touch again to touch it
 
 /** `?page=` from the URL; anything invalid is page 1. */
