@@ -8,6 +8,7 @@ import { useState } from "react";
 import { diaryDayHref } from "@/lib/diary/links";
 import { itemCountLabel } from "@/lib/meals/helpers";
 
+import Hint from "@/components/hint";
 import MacroLine from "@/components/meals/macro-line";
 
 import type { MealType } from "@/generated/prisma/enums";
@@ -53,14 +54,14 @@ export default function AddMealList({ meals, date, mealType, query }: AddMealLis
 
   if (meals.length === 0) {
     return query ? (
-      <p className="py-6 text-center text-sm text-foreground/60">לא נמצאו ארוחות עבור ״{query}״.</p>
+      <Hint>לא נמצאו ארוחות עבור ״{query}״.</Hint>
     ) : (
-      <p className="py-6 text-center text-sm text-foreground/60">
+      <Hint>
         עוד אין לכם ארוחות שמורות.{" "}
         <Link href="/meals/new" className="font-medium text-brand">
           יצירת ארוחה
         </Link>
-      </p>
+      </Hint>
     );
   }
 

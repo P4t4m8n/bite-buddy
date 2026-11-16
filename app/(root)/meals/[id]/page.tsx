@@ -7,7 +7,7 @@ import { getVisibleMeal } from "@/lib/meals/queries";
 import BackButton from "@/components/back-button";
 import MealEditor from "@/components/meals/meal-editor";
 import MealView from "@/components/meals/meal-view";
-import MealEditorSkeleton from "@/components/skeletons/mealEditorSkeleton";
+import MealEditorSkeleton from "@/components/skeletons/meal-editor-skeleton";
 
 import type { Metadata } from "next";
 

@@ -10,8 +10,8 @@ import { UNIT_LABELS } from "@/lib/nutrition/format";
 
 import Toast from "@/components/toast";
 
-import type { FoodUnit, MealType } from "@/generated/prisma/enums";
 import type { ToastMessage } from "@/components/toast";
+import type { FoodUnit, MealType } from "@/generated/prisma/enums";
 
 export type LogTarget =
   | { kind: "food"; foodId: string; name: string; amount: number; unit: FoodUnit }

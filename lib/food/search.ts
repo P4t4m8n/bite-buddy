@@ -1,7 +1,8 @@
 import "server-only";
-import type { FoodUnit } from "@/generated/prisma/enums";
 import { db } from "@/lib/db";
 import { escapeLike, MIN_QUERY_LENGTH, SEARCH_PAGE_SIZE } from "@/lib/food/search-params";
+
+import type { FoodUnit } from "@/generated/prisma/enums";
 
 export type FoodSearchResult = {
   id: string;

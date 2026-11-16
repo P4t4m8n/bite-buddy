@@ -10,9 +10,9 @@ import { UNIT_LABELS } from "@/lib/nutrition/format";
 
 import Toast from "@/components/toast";
 
+import type { ToastMessage } from "@/components/toast";
 import type { FoodUnit } from "@/generated/prisma/enums";
 import type { MealOption } from "@/lib/meals/types";
-import type { ToastMessage } from "@/components/toast";
 
 type AddToMealButtonProps = {
   foodId: string;

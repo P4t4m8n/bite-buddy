@@ -4,7 +4,9 @@ import Link from "next/link";
 import { addDays } from "@/lib/diary/dates";
 import { roundNutrient } from "@/lib/nutrition/format";
 
-import { CaloriesChart, MacrosChart, TrendChart } from "@/components/stats/charts";
+import CaloriesChart from "@/components/stats/calories-chart";
+import MacrosChart from "@/components/stats/macros-chart";
+import TrendChart from "@/components/stats/trend-chart";
 
 import type { WeeklyStats } from "@/lib/stats/queries";
 

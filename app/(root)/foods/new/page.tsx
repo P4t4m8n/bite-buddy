@@ -4,7 +4,7 @@ import { prefillFromSearchParams } from "@/lib/food/custom-food";
 
 import BackButton from "@/components/back-button";
 import CustomFoodForm from "@/components/food/custom-food-form";
-import MealEditorSkeleton from "@/components/skeletons/mealEditorSkeleton";
+import MealEditorSkeleton from "@/components/skeletons/meal-editor-skeleton";
 
 import type { Metadata } from "next";
 

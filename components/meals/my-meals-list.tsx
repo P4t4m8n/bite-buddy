@@ -1,21 +1,16 @@
 import { UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 
+import Hint from "@/components/hint";
 import MealCard from "@/components/meals/meal-card";
 
 import type { MealSummary } from "@/lib/meals/types";
 
-export default function MyMealsList({
-  meals,
-  query = "",
-}: {
-  meals: MealSummary[];
-  query?: string;
-}) {
+type MyMealsListProps = { meals: MealSummary[]; query?: string };
+
+export default function MyMealsList({ meals, query = "" }: MyMealsListProps) {
   if (meals.length === 0 && query) {
-    return (
-      <p className="py-8 text-center text-sm text-foreground/60">לא נמצאו ארוחות עבור ״{query}״.</p>
-    );
+    return <Hint>לא נמצאו ארוחות עבור ״{query}״.</Hint>;
   }
 
   if (meals.length === 0) {

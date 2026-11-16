@@ -1,12 +1,12 @@
+import { Salad } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { Salad } from "lucide-react";
 
 import { safeCallbackUrl } from "@/lib/auth/callback-url";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
-import DemoSignInButton from "@/components/demo-sign-in-button";
-import GoogleSignInButton from "@/components/google-sign-in-button";
+import DemoSignInButton from "@/components/auth/demo-sign-in-button";
+import GoogleSignInButton from "@/components/auth/google-sign-in-button";
 
 import type { Metadata } from "next";
 
@@ -33,14 +33,15 @@ export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
             </div>
           }
         >
-          <SignInForm searchParams={searchParams} />
+          <SignInLoader searchParams={searchParams} />
         </Suspense>
       </div>
     </div>
   );
 }
 
-const SignInForm = async ({ searchParams }: Pick<PageProps<"/sign-in">, "searchParams">) => {
+// smart: reads ?callbackUrl=&error= and sends signed-in users on
+const SignInLoader = async ({ searchParams }: Pick<PageProps<"/sign-in">, "searchParams">) => {
   const { callbackUrl, error } = await searchParams;
   const redirectTo = safeCallbackUrl(callbackUrl);
 

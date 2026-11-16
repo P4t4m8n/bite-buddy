@@ -1,9 +1,9 @@
-import { mealNutrition } from "@/lib/nutrition/nutrients";
 import { UNIT_LABELS } from "@/lib/nutrition/format";
+import { mealNutrition } from "@/lib/nutrition/nutrients";
 
-import { FoodImage } from "@/components/food/food-image";
-import CopyMealButton from "@/components/meals/copy-meal-button";
 import LogButton from "@/components/diary/log-button";
+import FoodImage from "@/components/food/food-image";
+import CopyMealButton from "@/components/meals/copy-meal-button";
 import MacroLine from "@/components/meals/macro-line";
 import MealTotals from "@/components/meals/meal-totals";
 

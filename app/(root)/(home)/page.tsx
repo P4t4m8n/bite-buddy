@@ -7,7 +7,7 @@ import DailySummary from "@/components/diary/daily-summary";
 import DayNavigator from "@/components/diary/day-navigator";
 import MealSection from "@/components/diary/meal-section";
 import TimezoneSync from "@/components/diary/timezone-sync";
-import DiarySkeleton from "@/components/skeletons/diarySkeleton";
+import DiarySkeleton from "@/components/skeletons/diary-skeleton";
 
 export default function Homepage({ searchParams }: PageProps<"/">) {
   return (

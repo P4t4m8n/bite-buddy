@@ -1,10 +1,10 @@
-import type { NextRequest } from "next/server";
-
 import { parseJsonBody, unauthorized } from "@/lib/api/responses";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { deleteLogEntry, updateLogEntry } from "@/lib/diary/mutations";
 import { logResponse } from "@/lib/diary/responses";
 import { updateLogEntrySchema } from "@/lib/diary/schemas";
+
+import type { NextRequest } from "next/server";
 
 /** PATCH /api/log/[id] — { amount? | servings?, mealType? } on the user's own entry. */
 export const PATCH = async (request: NextRequest, { params }: RouteContext<"/api/log/[id]">) => {

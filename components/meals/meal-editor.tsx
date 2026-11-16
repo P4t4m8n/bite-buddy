@@ -14,8 +14,8 @@ import {
 } from "@/lib/nutrition/amount";
 import { mealNutrition } from "@/lib/nutrition/nutrients";
 
-import FoodPicker from "@/components/meals/food-picker";
 import LogButton from "@/components/diary/log-button";
+import FoodPicker from "@/components/meals/food-picker";
 import MealItemRow, { moveButtonId } from "@/components/meals/meal-item-row";
 import MealTotals from "@/components/meals/meal-totals";
 import VisibilitySwitch from "@/components/meals/visibility-switch";

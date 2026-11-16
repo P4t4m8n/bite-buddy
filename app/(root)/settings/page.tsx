@@ -3,11 +3,11 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth/current-user";
 import { getUserSettings } from "@/lib/user/settings";
 
-import { PageHeader } from "@/components/page-header";
+import PageHeader from "@/components/page-header";
 import InstallApp from "@/components/pwa/install-app";
 import GoalsForm from "@/components/settings/goals-form";
 import WeekStartSetting from "@/components/settings/week-start-setting";
-import MealEditorSkeleton from "@/components/skeletons/mealEditorSkeleton";
+import MealEditorSkeleton from "@/components/skeletons/meal-editor-skeleton";
 
 import type { Metadata } from "next";
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { hasHebrew } from "@/lib/food/hebrew";
 
 describe("hasHebrew", () => {

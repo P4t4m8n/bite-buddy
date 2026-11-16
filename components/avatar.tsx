@@ -2,7 +2,7 @@ import Image from "next/image";
 
 type AvatarProps = { name: string | null; image: string | null; size?: number };
 
-export function Avatar({ name, image, size = 32 }: AvatarProps) {
+export default function Avatar({ name, image, size = 32 }: AvatarProps) {
   if (image) {
     return (
       <Image

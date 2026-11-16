@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { MIN_QUERY_LENGTH } from "@/lib/food/search-params";
 import { roundNutrient, UNIT_LABELS } from "@/lib/nutrition/format";
 
-import { FoodImage } from "@/components/food/food-image";
+import FoodImage from "@/components/food/food-image";
 
 import type { FoodSearchPage, FoodSearchResult } from "@/lib/food/search";
 

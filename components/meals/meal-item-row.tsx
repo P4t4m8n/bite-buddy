@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { MAX_AMOUNT } from "@/lib/nutrition/amount";
 import { UNIT_LABELS } from "@/lib/nutrition/format";
 
-import { FoodImage } from "@/components/food/food-image";
+import FoodImage from "@/components/food/food-image";
 import MacroLine from "@/components/meals/macro-line";
 
 import type { MealFood } from "@/lib/meals/types";

@@ -1,5 +1,6 @@
 import { formatPercent } from "@/lib/nutrition/format";
 import { macroSplit } from "@/lib/nutrition/nutrients";
+
 import type { Nutrients } from "@/lib/nutrition/types";
 
 const MACROS = [
@@ -8,7 +9,7 @@ const MACROS = [
   { key: "fat", label: "שומן", color: "bg-rose-500" },
 ] as const;
 
-export const MacroSplitBar = ({ nutrients }: { nutrients: Nutrients }) => {
+export default function MacroSplitBar({ nutrients }: { nutrients: Nutrients }) {
   const split = macroSplit(nutrients);
   if (!split) return null;
 
@@ -33,4 +34,4 @@ export const MacroSplitBar = ({ nutrients }: { nutrients: Nutrients }) => {
       </ul>
     </div>
   );
-};
+}

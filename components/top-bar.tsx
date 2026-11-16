@@ -1,11 +1,13 @@
 import { Salad } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import { UserMenu } from "@/components/user-menu";
+
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { DEMO_EMAIL } from "@/lib/auth/demo-login";
 
-export function TopBar() {
+import UserMenu from "@/components/user-menu";
+
+export default function TopBar() {
   return (
     <header className="sticky top-0 z-10 border-b border-black/10 bg-background/95 pt-[env(safe-area-inset-top)] backdrop-blur dark:border-white/10">
       <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">

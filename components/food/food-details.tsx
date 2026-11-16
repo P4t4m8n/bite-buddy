@@ -1,13 +1,17 @@
-import { Food } from "@/generated/prisma/client";
-import { FoodImage } from "./food/food-image";
 import { translateAllergen } from "@/lib/food/allergens";
 import { UNIT_LABELS } from "@/lib/nutrition/format";
-import FoodAmountActions from "./food/food-amount-actions";
-import { NutriScoreBadge, NovaBadge } from "./food/food-badges";
+
+import FoodAmountActions from "@/components/food/food-amount-actions";
+import FoodImage from "@/components/food/food-image";
+import NovaBadge from "@/components/food/nova-badge";
+import NutriScoreBadge from "@/components/food/nutri-score-badge";
+
+import type { Food } from "@/generated/prisma/client";
 
 type FoodDetailsProps = {
   food: Food;
 };
+
 export default function FoodDetails({ food }: FoodDetailsProps) {
   return (
     <article className="space-y-6">

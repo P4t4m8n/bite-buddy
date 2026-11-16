@@ -1,7 +1,8 @@
-import type { Metadata, Viewport } from "next";
 import { Heebo } from "next/font/google";
 
 import ServiceWorkerRegister from "@/components/pwa/service-worker-register";
+
+import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 
