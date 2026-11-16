@@ -13,6 +13,7 @@ import AddToDiary from "@/components/diary/add-to-diary";
 import MealListSkeleton from "@/components/skeletons/meal-list-skeleton";
 
 import type { Metadata } from "next";
+import AddToDiary from "@/components/diary/add-to-diary";
 
 export const metadata: Metadata = { title: "הוספה ליומן" };
 
