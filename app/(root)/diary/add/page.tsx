@@ -9,10 +9,10 @@ import { listMyMeals } from "@/lib/meals/queries";
 import { getUserSettings } from "@/lib/user/settings";
 
 import BackButton from "@/components/back-button";
-import MealListSkeleton from "@/components/skeletons/mealListSkeleton";
+import AddToDiary from "@/components/diary/add-to-diary";
+import MealListSkeleton from "@/components/skeletons/meal-list-skeleton";
 
 import type { Metadata } from "next";
-import AddToDiary from "@/components/diary/add-to-diary";
 
 export const metadata: Metadata = { title: "הוספה ליומן" };
 
@@ -46,5 +46,5 @@ const AddToDiaryLoader = async ({
   const today = dateKeyInZone(new Date(), settings.timezone);
   const date = isDateKey(params.date) ? params.date : today;
 
-  return <AddToDiary date={date} today={today} mealType={mealType} meals={meals} query={query} />;
+  return <AddToDiary mealType={mealType} date={date} today={today} meals={meals} query={query} />;
 };

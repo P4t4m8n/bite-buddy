@@ -1,5 +1,6 @@
-import type { FoodUnit } from "@/generated/prisma/enums";
 import { formatNutrient, UNIT_LABELS } from "@/lib/nutrition/format";
+
+import type { FoodUnit } from "@/generated/prisma/enums";
 import type { NutrientKey, Nutrients } from "@/lib/nutrition/types";
 
 export const NUTRIENT_ROWS: { key: NutrientKey; label: string; sub?: boolean }[] = [
@@ -20,32 +21,34 @@ type NutritionTableProps = {
   amountLabel: string;
 };
 
-export const NutritionTable = ({ per100, amount, unit, amountLabel }: NutritionTableProps) => (
-  <table className="w-full text-sm">
-    <thead>
-      <tr className="border-b border-foreground/10 text-start text-xs text-foreground/60">
-        <th className="py-2 text-start font-medium">רכיב</th>
-        <th className="py-2 text-end font-medium">ל־100 {UNIT_LABELS[unit]}</th>
-        <th className="py-2 text-end font-medium">{amountLabel}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {NUTRIENT_ROWS.map(({ key, label, sub }) => (
-        <tr key={key} className="border-b border-foreground/5 last:border-0">
-          <th
-            scope="row"
-            className={`py-2 text-start font-normal ${sub ? "ps-4 text-foreground/60" : "font-medium"}`}
-          >
-            {label}
-          </th>
-          <td className="py-2 text-end text-foreground/60 tabular-nums">
-            {formatNutrient(key, per100[key])}
-          </td>
-          <td className="py-2 text-end font-medium tabular-nums">
-            {formatNutrient(key, amount[key])}
-          </td>
+export default function NutritionTable({ per100, amount, unit, amountLabel }: NutritionTableProps) {
+  return (
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="border-b border-foreground/10 text-start text-xs text-foreground/60">
+          <th className="py-2 text-start font-medium">רכיב</th>
+          <th className="py-2 text-end font-medium">ל־100 {UNIT_LABELS[unit]}</th>
+          <th className="py-2 text-end font-medium">{amountLabel}</th>
         </tr>
-      ))}
-    </tbody>
-  </table>
-);
+      </thead>
+      <tbody>
+        {NUTRIENT_ROWS.map(({ key, label, sub }) => (
+          <tr key={key} className="border-b border-foreground/5 last:border-0">
+            <th
+              scope="row"
+              className={`py-2 text-start font-normal ${sub ? "ps-4 text-foreground/60" : "font-medium"}`}
+            >
+              {label}
+            </th>
+            <td className="py-2 text-end text-foreground/60 tabular-nums">
+              {formatNutrient(key, per100[key])}
+            </td>
+            <td className="py-2 text-end font-medium tabular-nums">
+              {formatNutrient(key, amount[key])}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}

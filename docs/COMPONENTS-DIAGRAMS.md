@@ -100,7 +100,7 @@ flowchart TD
 flowchart TD
   Page["/sign-in<br/>SignInPage"]:::page
   subgraph S1 ["Suspense: disabled buttons"]
-    Form["SignInForm"]:::server
+    Form["SignInLoader"]:::server
   end
   Page --> Form
   Form -.signed in → redirect.-> D1[("auth/current-user<br/>getCurrentUser")]:::data
@@ -157,12 +157,14 @@ flowchart TD
   end
   Page --> Loader
   Loader -.-> D1[("meals/queries.listMyMeals<br/>user/settings.getUserSettings")]:::data
-  Loader --> Header["PageHeader"]:::server
-  Loader --> Quick["QuickLink ×2"]:::server
-  Loader --> SI["SearchInput"]:::client
-  Loader --> List["AddMealList"]:::client
+  Loader --> View["AddToDiary<br/>(dumb)"]:::server
+  View --> Header["PageHeader"]:::server
+  View --> Quick["links"]:::server
+  View --> SI["SearchInput"]:::client
+  View --> List["AddMealList"]:::client
   Quick --> SearchPage["/search"]:::page
   Quick --> ScanPage["/scan"]:::page
+  List --> Hint["Hint"]:::client
   List --> ML["MacroLine"]:::client
   List -.1 serving.-> A1{{"POST /api/log"}}:::api
 
@@ -181,13 +183,16 @@ flowchart TD
   Page["/search ?q= &page=<br/>SearchPage"]:::page
   Page --> Header["PageHeader"]:::server
   Page --> SI["SearchInput<br/>writes ?q= to the URL"]:::client
-  subgraph S1 ["Suspense: ResultsSkeleton"]
-    Results["SearchResults"]:::server
+  subgraph S1 ["Suspense: SearchResultsSkeleton"]
+    Loader["SearchResultsLoader"]:::server
   end
-  Page --> Results
-  Results -.-> D1[("food/search<br/>searchFoods")]:::data
+  Page --> Loader
+  Loader -.-> D1[("food/search<br/>searchFoods")]:::data
+  Loader --> Results["SearchResults<br/>(dumb)"]:::server
+  Results --> Hint["Hint"]:::server
   Results --> Item["FoodListItem ×n"]:::server
   Results --> NewLink["NewFoodLink"]:::server
+  Results --> Pag["Pagination"]:::server
   Item --> Img["FoodImage"]:::client
   Item --> FoodPage["/food/[id]"]:::page
   NewLink --> NewFood["/foods/new"]:::page
@@ -237,7 +242,8 @@ flowchart TD
   Details --> Actions["FoodAmountActions<br/>holds the amount"]:::client
   Details --> Allergens["Allergens"]:::server
   Header --> Img["FoodImage"]:::client
-  Header --> Badges["NutriScoreBadge · NovaBadge"]:::server
+  Header --> NS["NutriScoreBadge"]:::server
+  Header --> Nova["NovaBadge"]:::server
   Actions --> Calc["FoodAmountCalculator"]:::client
   Actions --> Log["LogButton"]:::client
   Actions --> AddMeal["AddToMealButton"]:::client
@@ -311,6 +317,9 @@ flowchart TD
 
   MyList --> Card["MealCard ×n"]:::server
   PubList --> Card
+  MyList --> Hint["Hint"]:::server
+  PubList --> Hint
+  PubList --> Pag["Pagination"]:::server
   Card --> Badge["VisibilityBadge"]:::server
   Card --> ML["MacroLine"]:::server
   Card --> MealPage["/meals/[id]"]:::page

@@ -3,8 +3,8 @@ import { Suspense } from "react";
 import { requireUser } from "@/lib/auth/current-user";
 import { getWeeklyStats } from "@/lib/stats/queries";
 
-import { PageHeader } from "@/components/page-header";
-import DiarySkeleton from "@/components/skeletons/diarySkeleton";
+import PageHeader from "@/components/page-header";
+import DiarySkeleton from "@/components/skeletons/diary-skeleton";
 import StatsView from "@/components/stats/stats-view";
 
 import type { Metadata } from "next";

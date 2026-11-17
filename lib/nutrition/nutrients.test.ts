@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import {
   foodPer100,
   macroSplit,
@@ -7,6 +8,7 @@ import {
   scale,
   sumNutrients,
 } from "@/lib/nutrition/nutrients";
+
 import type { FoodNutrition, Nutrients } from "@/lib/nutrition/types";
 
 // Real seed values per 100 g.

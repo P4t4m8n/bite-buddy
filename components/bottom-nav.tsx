@@ -1,8 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Suspense } from "react";
 import {
   ChartColumn,
   House,
@@ -11,6 +8,10 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Suspense } from "react";
+
 import { isNavItemActive } from "@/lib/navigation";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
@@ -23,7 +24,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/stats", label: "סטטיסטיקה", icon: ChartColumn },
 ];
 
-export function BottomNav() {
+export default function BottomNav() {
   return (
     <nav
       aria-label="ניווט ראשי"

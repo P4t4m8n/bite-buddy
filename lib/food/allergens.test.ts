@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { translateAllergen } from "@/lib/food/allergens";
 
 describe("translateAllergen", () => {

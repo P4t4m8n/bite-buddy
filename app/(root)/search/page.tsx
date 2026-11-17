@@ -1,13 +1,16 @@
-import type { Metadata } from "next";
-import { Plus } from "lucide-react";
-import Link from "next/link";
 import { Suspense } from "react";
-import { FoodListItem } from "@/components/food/food-list-item";
-import { PageHeader } from "@/components/page-header";
-import { SearchInput } from "@/components/search/search-input";
+
 import { requireUser } from "@/lib/auth/current-user";
 import { searchFoods } from "@/lib/food/search";
-import { MIN_QUERY_LENGTH, parseFoodSearchParams, searchHref } from "@/lib/food/search-params";
+import { MIN_QUERY_LENGTH, parseFoodSearchParams } from "@/lib/food/search-params";
+
+import PageHeader from "@/components/page-header";
+import SearchInput from "@/components/search/search-input";
+import SearchResults from "@/components/search/search-results";
+import SearchInputSkeleton from "@/components/skeletons/search-input-skeleton";
+import SearchResultsSkeleton from "@/components/skeletons/search-results-skeleton";
+
+import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "חיפוש" };
 
@@ -16,89 +19,28 @@ export default function SearchPage({ searchParams }: PageProps<"/search">) {
     <>
       <PageHeader title="חיפוש" description="מחפשים מוצרים לפי שם או מותג." />
       {/* The input reads the URL, so it renders on the client behind a boundary. */}
-      <Suspense fallback={<div className="h-12 rounded-xl border border-foreground/15" />}>
+      <Suspense fallback={<SearchInputSkeleton />}>
         <SearchInput />
       </Suspense>
       <div className="mt-4">
-        <Suspense fallback={<ResultsSkeleton />}>
-          <SearchResults searchParams={searchParams} />
+        <Suspense fallback={<SearchResultsSkeleton />}>
+          <SearchResultsLoader searchParams={searchParams} />
         </Suspense>
       </div>
     </>
   );
 }
 
-const SearchResults = async ({ searchParams }: Pick<PageProps<"/search">, "searchParams">) => {
+// smart: reads ?q=&page= and the user, then searches
+const SearchResultsLoader = async ({
+  searchParams,
+}: Pick<PageProps<"/search">, "searchParams">) => {
   const { q, page } = parseFoodSearchParams(await searchParams);
-
   if (q.length < MIN_QUERY_LENGTH) {
-    return <Hint>הקלידו לפחות {MIN_QUERY_LENGTH} תווים כדי לחפש.</Hint>;
+    return <SearchResults query={q} page={page} items={[]} hasMore={false} />;
   }
 
   const user = await requireUser();
   const { items, hasMore } = await searchFoods({ query: q, page, userId: user.id });
-
-  if (items.length === 0) {
-    return (
-      <>
-        <Hint>לא נמצאו מוצרים עבור ״{q}״.</Hint>
-        <NewFoodLink query={q} />
-      </>
-    );
-  }
-
-  return (
-    <>
-      <ul className="-mx-2">
-        {items.map((food) => (
-          <FoodListItem key={food.id} food={food} />
-        ))}
-      </ul>
-      {hasMore ? null : <NewFoodLink query={q} />}
-      {page > 1 || hasMore ? (
-        <nav aria-label="עמודים" className="mt-4 flex items-center justify-between text-sm">
-          {page > 1 ? (
-            <Link href={searchHref(q, page - 1)} className="font-medium text-brand">
-              → הקודם
-            </Link>
-          ) : (
-            <span />
-          )}
-          <span className="text-foreground/60">עמוד {page}</span>
-          {hasMore ? (
-            <Link href={searchHref(q, page + 1)} className="font-medium text-brand">
-              הבא ←
-            </Link>
-          ) : (
-            <span />
-          )}
-        </nav>
-      ) : null}
-    </>
-  );
+  return <SearchResults query={q} page={page} items={items} hasMore={hasMore} />;
 };
-
-const Hint = ({ children }: { children: React.ReactNode }) => (
-  <p className="py-8 text-center text-sm text-foreground/60">{children}</p>
-);
-
-const NewFoodLink = ({ query }: { query: string }) => (
-  <Link
-    href={`/foods/new?${new URLSearchParams({ name: query })}`}
-    className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-foreground/20 p-3 text-sm font-medium text-brand hover:bg-brand/5"
-  >
-    <Plus aria-hidden className="size-4" />
-    לא מצאתם? הוספת מוצר חדש
-  </Link>
-);
-
-const ResultsSkeleton = () => (
-  <ul aria-hidden className="space-y-2">
-    {Array.from({ length: 6 }, (_, i) => (
-      <li key={i} className="flex items-center gap-3 p-2">
-        <span className="size-12 animate-pulse rounded-lg bg-foreground/10" />
-        <span className="h-4 flex-1 animate-pulse rounded bg-foreground/10" />
-      </li>
-    ))}
-  </ul>
-);

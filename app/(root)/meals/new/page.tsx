@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth/current-user";
 
 import BackButton from "@/components/back-button";
 import MealEditor from "@/components/meals/meal-editor";
-import MealEditorSkeleton from "@/components/skeletons/mealEditorSkeleton";
+import MealEditorSkeleton from "@/components/skeletons/meal-editor-skeleton";
 
 import type { Metadata } from "next";
 

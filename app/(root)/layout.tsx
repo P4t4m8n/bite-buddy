@@ -1,5 +1,5 @@
-import { BottomNav } from "@/components/bottom-nav";
-import { TopBar } from "@/components/top-bar";
+import BottomNav from "@/components/bottom-nav";
+import TopBar from "@/components/top-bar";
 
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (

@@ -2,10 +2,10 @@ import Link from "next/link";
 
 import { roundNutrient } from "@/lib/nutrition/format";
 
-import { MacroSplitBar } from "@/components/food/macro-split-bar";
+import MacroSplitBar from "@/components/food/macro-split-bar";
 
-import type { UserGoals } from "@/lib/user/settings";
 import type { NutrientTotals } from "@/lib/nutrition/types";
+import type { UserGoals } from "@/lib/user/settings";
 
 const ROWS = [
   { key: "kcal", goal: "kcal", label: "קלוריות", unit: "קק״ל", color: "bg-brand" },

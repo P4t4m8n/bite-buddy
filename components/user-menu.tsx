@@ -4,13 +4,15 @@ import { LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { Avatar } from "@/components/avatar";
-import { clearUserCache } from "@/components/pwa/service-worker-register";
+
 import { authClient } from "@/lib/auth/client";
+
+import Avatar from "@/components/avatar";
+import { clearUserCache } from "@/components/pwa/service-worker-register";
 
 type UserMenuProps = { name: string; email: string | null; image: string | null };
 
-export function UserMenu({ name, email, image }: UserMenuProps) {
+export default function UserMenu({ name, email, image }: UserMenuProps) {
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);

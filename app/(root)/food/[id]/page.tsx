@@ -5,8 +5,8 @@ import { requireUser } from "@/lib/auth/current-user";
 import { getVisibleFood } from "@/lib/food/search";
 
 import BackButton from "@/components/back-button";
-import FoodDetails from "@/components/FoodDetails";
-import FoodSkeleton from "@/components/skeletons/foodSkeleton";
+import FoodDetails from "@/components/food/food-details";
+import FoodSkeleton from "@/components/skeletons/food-skeleton";
 
 import type { Metadata } from "next";
 

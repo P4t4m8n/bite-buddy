@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+
 import { db } from "@/lib/db";
 import { hasHebrew } from "@/lib/food/hebrew";
 import { normalizeSeedFood, type RawSeedFood } from "@/lib/food/normalize-seed";

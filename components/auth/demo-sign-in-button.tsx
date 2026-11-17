@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { authClient } from "@/lib/auth/client";
+import { useFetchStatus } from "@/lib/hooks/use-fatch-status";
 
 type DemoSignInButtonProps = {
   callbackUrl?: string;
@@ -12,16 +12,13 @@ export default function DemoSignInButton({
   callbackUrl = "/",
   disabled = false,
 }: DemoSignInButtonProps) {
-  const [pending, setPending] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const { pending, failed, onStart, onError } = useFetchStatus();
 
   const handleClick = async () => {
-    setPending(true);
-    setFailed(false);
+    onStart();
     const { error } = await authClient.$fetch("/demo/sign-in", { method: "POST", body: {} });
     if (error) {
-      setPending(false);
-      setFailed(true);
+      onError();
       return;
     }
     // A full load, so every server component reads the new session cookie.

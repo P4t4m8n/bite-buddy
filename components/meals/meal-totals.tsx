@@ -1,6 +1,7 @@
-import { MacroSplitBar } from "@/components/food/macro-split-bar";
-import { NUTRIENT_ROWS } from "@/components/food/nutrition-table";
 import { formatNutrient, roundNutrient, UNKNOWN } from "@/lib/nutrition/format";
+
+import MacroSplitBar from "@/components/food/macro-split-bar";
+import { NUTRIENT_ROWS } from "@/components/food/nutrition-table";
 
 import type { NutrientTotals } from "@/lib/nutrition/types";
 

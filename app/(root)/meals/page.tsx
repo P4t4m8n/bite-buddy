@@ -7,9 +7,10 @@ import { parseMealQuery } from "@/lib/meals/helpers";
 import { listMyMeals } from "@/lib/meals/queries";
 
 import MyMealsList from "@/components/meals/my-meals-list";
-import { PageHeader } from "@/components/page-header";
-import { SearchInput } from "@/components/search/search-input";
-import MealListSkeleton from "@/components/skeletons/mealListSkeleton";
+import PageHeader from "@/components/page-header";
+import SearchInput from "@/components/search/search-input";
+import MealListSkeleton from "@/components/skeletons/meal-list-skeleton";
+import SearchInputSkeleton from "@/components/skeletons/search-input-skeleton";
 
 import type { Metadata } from "next";
 
@@ -33,7 +34,7 @@ export default function MealsPage({ searchParams }: PageProps<"/meals">) {
       />
       <Link
         href="/meals/public"
-        className="mb-4 flex items-center gap-2 rounded-xl bg-foreground/[0.03] p-3 text-sm font-medium hover:bg-foreground/5"
+        className="mb-4 flex items-center gap-2 rounded-xl bg-foreground/3 p-3 text-sm font-medium hover:bg-foreground/5"
       >
         <Globe aria-hidden className="size-4 text-brand" />
         ארוחות ציבוריות של משתמשים אחרים
@@ -51,10 +52,9 @@ export default function MealsPage({ searchParams }: PageProps<"/meals">) {
   );
 }
 
+// smart: reads ?q= and the user's meals
 const MyMealsLoader = async ({ searchParams }: Pick<PageProps<"/meals">, "searchParams">) => {
   const query = parseMealQuery((await searchParams).q);
   const user = await requireUser();
   return <MyMealsList meals={await listMyMeals(user.id, query)} query={query} />;
 };
-
-const SearchInputSkeleton = () => <div className="h-12 rounded-xl border border-foreground/15" />;

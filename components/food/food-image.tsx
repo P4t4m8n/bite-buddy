@@ -6,7 +6,7 @@ import { useState } from "react";
 
 type FoodImageProps = { src: string | null; name: string; size?: number };
 
-export const FoodImage = ({ src, name, size = 48 }: FoodImageProps) => {
+export default function FoodImage({ src, name, size = 48 }: FoodImageProps) {
   const [failed, setFailed] = useState(false);
 
   if (!src || failed) {
@@ -35,4 +35,4 @@ export const FoodImage = ({ src, name, size = 48 }: FoodImageProps) => {
       style={{ width: size, height: size }}
     />
   );
-};
+}

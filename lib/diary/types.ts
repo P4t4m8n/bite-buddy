@@ -1,7 +1,7 @@
 import type { FoodUnit, MealType } from "@/generated/prisma/enums";
 import type { DateKey } from "@/lib/diary/dates";
-import type { UserGoals } from "@/lib/user/settings";
 import type { NutrientTotals, Nutrients } from "@/lib/nutrition/types";
+import type { UserGoals } from "@/lib/user/settings";
 
 export type DiaryEntry = {
   id: string;

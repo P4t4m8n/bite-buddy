@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { isNavItemActive } from "@/lib/navigation";
 
 describe("isNavItemActive", () => {

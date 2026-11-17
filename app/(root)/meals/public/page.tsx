@@ -5,10 +5,11 @@ import { parseMealQuery, parsePageParam } from "@/lib/meals/helpers";
 import { listPublicMeals } from "@/lib/meals/queries";
 
 import BackButton from "@/components/back-button";
-import { PageHeader } from "@/components/page-header";
 import PublicMealsList from "@/components/meals/public-meals-list";
-import { SearchInput } from "@/components/search/search-input";
-import MealListSkeleton from "@/components/skeletons/mealListSkeleton";
+import PageHeader from "@/components/page-header";
+import SearchInput from "@/components/search/search-input";
+import MealListSkeleton from "@/components/skeletons/meal-list-skeleton";
+import SearchInputSkeleton from "@/components/skeletons/search-input-skeleton";
 
 import type { Metadata } from "next";
 
@@ -26,7 +27,7 @@ export default function PublicMealsPage({ searchParams }: PageProps<"/meals/publ
       />
       <div className="mb-4">
         {/* The input reads the URL, so it renders on the client behind a boundary. */}
-        <Suspense fallback={<div className="h-12 rounded-xl border border-foreground/15" />}>
+        <Suspense fallback={<SearchInputSkeleton />}>
           <SearchInput label="חיפוש ארוחה ציבורית" />
         </Suspense>
       </div>
@@ -37,6 +38,7 @@ export default function PublicMealsPage({ searchParams }: PageProps<"/meals/publ
   );
 }
 
+// smart: reads ?q=&page= and the public meals of other users
 const PublicMealsLoader = async ({
   searchParams,
 }: Pick<PageProps<"/meals/public">, "searchParams">) => {

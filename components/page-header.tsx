@@ -4,7 +4,7 @@ type PageHeaderProps = {
   /** e.g. a "new" button, shown at the end of the title row. */
   action?: React.ReactNode;
 };
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export default function PageHeader({ title, description, action }: PageHeaderProps) {
   return (
     <header className="mb-6 flex items-start justify-between gap-4">
       <div>

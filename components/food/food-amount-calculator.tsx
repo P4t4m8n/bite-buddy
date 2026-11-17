@@ -1,10 +1,11 @@
 "use client";
 
-import { MacroSplitBar } from "@/components/food/macro-split-bar";
-import { NutritionTable } from "@/components/food/nutrition-table";
 import { displayAmount, MAX_AMOUNT } from "@/lib/nutrition/amount";
 import { UNIT_LABELS } from "@/lib/nutrition/format";
 import { foodPer100, scale } from "@/lib/nutrition/nutrients";
+
+import MacroSplitBar from "@/components/food/macro-split-bar";
+import NutritionTable from "@/components/food/nutrition-table";
 
 import type { FoodUnit } from "@/generated/prisma/enums";
 import type { FoodNutrition } from "@/lib/nutrition/types";

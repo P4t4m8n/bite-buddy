@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { escapeLike, parseFoodSearchParams, searchHref } from "@/lib/food/search-params";
 
 describe("parseFoodSearchParams", () => {

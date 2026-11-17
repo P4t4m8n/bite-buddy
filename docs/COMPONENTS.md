@@ -49,9 +49,9 @@ proxy.ts sends signed-out visitors to /sign-in?callbackUrl=... (cookie check onl
 ```
 /sign-in   app/(auth)/sign-in/page.tsx  SignInPage (S)       layout: app/(auth)/layout.tsx
 └─ ⟨Suspense: disabled buttons⟩
-   └─ SignInForm (S)  ◆ auth/current-user.getCurrentUser    signed in → redirect to callbackUrl
-      ├─ GoogleSignInButton (C)   ⇢ authClient.signIn.social (Better Auth → Google)
-      └─ DemoSignInButton (C)     ⇢ POST /api/auth/demo/sign-in  (plugin: lib/auth/demo-login.ts)
+   └─ SignInLoader (S)  ◆ auth/current-user.getCurrentUser  signed in → redirect to callbackUrl
+      ├─ GoogleSignInButton (C)   components/auth/ ⇢ authClient.signIn.social (Better Auth → Google)
+      └─ DemoSignInButton (C)     components/auth/ ⇢ POST /api/auth/demo/sign-in  (plugin: lib/auth/demo-login.ts)
 ```
 
 ## 2. Today (diary)
@@ -77,11 +77,13 @@ proxy.ts sends signed-out visitors to /sign-in?callbackUrl=... (cookie check onl
 ├─ BackButton (C)
 └─ ⟨Suspense: MealListSkeleton⟩
    └─ AddToDiaryLoader (S)  ◆ meals/queries.listMyMeals, user/settings.getUserSettings
-      ├─ PageHeader (S)                  "הוספה לארוחת צהריים" + day
-      ├─ QuickLink ×2 (S)                → /search, → /scan
-      ├─ SearchInput (C)                 writes ?q= to the URL
-      └─ AddMealList (C)                 ⇢ POST /api/log  (1 serving), then back to the diary
-         └─ MacroLine (C*)
+      └─ AddToDiary (S)                  components/diary/add-to-diary.tsx (dumb)
+         ├─ PageHeader (S)               "הוספה לארוחת צהריים" + day
+         ├─ links → /search, /scan
+         ├─ ⟨Suspense: SearchInputSkeleton⟩ SearchInput (C)   writes ?q= to the URL
+         └─ AddMealList (C)              ⇢ POST /api/log  (1 serving), then back to the diary
+            ├─ Hint (C*)                 no meals / no match
+            └─ MacroLine (C*)
 ```
 
 ## 3. Food search
@@ -89,13 +91,15 @@ proxy.ts sends signed-out visitors to /sign-in?callbackUrl=... (cookie check onl
 ```
 /search?q=…&page=…   app/(root)/search/page.tsx  SearchPage (S)
 ├─ PageHeader (S)
-├─ ⟨Suspense⟩ SearchInput (C)            writes ?q= to the URL after 300 ms
-└─ ⟨Suspense: ResultsSkeleton⟩
-   └─ SearchResults (S)  ◆ food/search.searchFoods
-      ├─ FoodListItem (S) ×n → /food/[id]
-      │  └─ FoodImage (C)
-      ├─ NewFoodLink (S)                 → /foods/new?name=…
-      └─ previous / next page links
+├─ ⟨Suspense: SearchInputSkeleton⟩ SearchInput (C)   writes ?q= to the URL after 300 ms (hook: lib/hooks/use-search-input.ts)
+└─ ⟨Suspense: SearchResultsSkeleton⟩
+   └─ SearchResultsLoader (S)  ◆ food/search.searchFoods
+      └─ SearchResults (S)               components/search/search-results.tsx (dumb)
+         ├─ Hint (S)                     too short / no results
+         ├─ FoodListItem (S) ×n → /food/[id]
+         │  └─ FoodImage (C)
+         ├─ NewFoodLink (S)              → /foods/new?name=…
+         └─ Pagination (S)
 ```
 
 ## 4. Scan a barcode
@@ -118,10 +122,11 @@ proxy.ts sends signed-out visitors to /sign-in?callbackUrl=... (cookie check onl
 ├─ BackButton (C)
 └─ ⟨Suspense: FoodSkeleton⟩
    └─ FoodLoader (S)  ◆ food/search.getVisibleFood          missing → notFound()
-      └─ FoodDetails (S)                 components/FoodDetails.tsx (dumb: gets `food`)
+      └─ FoodDetails (S)                 components/food/food-details.tsx (dumb: gets `food`)
          ├─ Header
          │  ├─ FoodImage (C)
-         │  └─ NutriScoreBadge, NovaBadge (S)
+         │  ├─ NutriScoreBadge (S)
+         │  └─ NovaBadge (S)
          ├─ FoodAmountActions (C)        holds the chosen amount
          │  ├─ FoodAmountCalculator (C)  quick amounts + custom amount
          │  │  ├─ MacroSplitBar (C*)
@@ -154,10 +159,11 @@ proxy.ts sends signed-out visitors to /sign-in?callbackUrl=... (cookie check onl
 /meals?q=…   app/(root)/meals/page.tsx  MealsPage (S)
 ├─ PageHeader (S) + "ארוחה חדשה" link → /meals/new
 ├─ link → /meals/public
-├─ ⟨Suspense⟩ SearchInput (C)           "חיפוש ארוחה"
+├─ ⟨Suspense: SearchInputSkeleton⟩ SearchInput (C)   "חיפוש ארוחה"
 └─ ⟨Suspense: MealListSkeleton⟩
    └─ MyMealsLoader (S)  ◆ meals/queries.listMyMeals
       └─ MyMealsList (S)
+         ├─ Hint (S)                     no match for the search
          └─ MealCard (S) ×n → /meals/[id]
             ├─ VisibilityBadge (S)
             └─ MacroLine (S)
@@ -168,11 +174,13 @@ proxy.ts sends signed-out visitors to /sign-in?callbackUrl=... (cookie check onl
 ```
 /meals/public?q=…&page=…   app/(root)/meals/public/page.tsx  PublicMealsPage (S)
 ├─ BackButton (C), PageHeader (S)
-├─ ⟨Suspense⟩ SearchInput (C)           "חיפוש ארוחה ציבורית"
+├─ ⟨Suspense: SearchInputSkeleton⟩ SearchInput (C)   "חיפוש ארוחה ציבורית"
 └─ ⟨Suspense: MealListSkeleton⟩
    └─ PublicMealsLoader (S)  ◆ meals/queries.listPublicMeals
       └─ PublicMealsList (S)
-         └─ MealCard (S) ×n  (shows "מאת {owner}")
+         ├─ Hint (S)                     empty / no match
+         ├─ MealCard (S) ×n  (shows "מאת {owner}")
+         └─ Pagination (S)
 ```
 
 ### 7c. One meal (owner edits, others view)
@@ -220,9 +228,10 @@ MealEditor (C)                           components/meals/meal-editor.tsx
 └─ ⟨Suspense: DiarySkeleton⟩
    └─ StatsLoader (S)  ◆ stats/queries.getWeeklyStats  (sums in lib/stats/aggregate.ts)
       └─ StatsView (S)                   weekly averages vs. goals
-         ├─ CaloriesChart (C)            components/stats/charts.tsx (Recharts)
-         ├─ MacrosChart (C)
-         └─ TrendChart (C)
+         ├─ CaloriesChart (C)            components/stats/calories-chart.tsx (Recharts)
+         ├─ MacrosChart (C)              components/stats/macros-chart.tsx
+         └─ TrendChart (C)               components/stats/trend-chart.tsx
+                                         shared formatting: lib/stats/chart-format.ts
 ```
 
 ## 9. Settings and goals
@@ -262,6 +271,8 @@ ServiceWorkerRegister (C)    registers sw.js in production; clearUserCache() on 
 | `NutritionTable`  | FoodAmountCalculator, MealTotals                              |
 | `LogButton` (C)   | FoodAmountActions, MealEditor, MealView                       |
 | `Toast`           | LogButton, AddToMealButton                                    |
+| `Hint` (S)        | SearchResults, MyMealsList, PublicMealsList, AddMealList      |
+| `Pagination` (S)  | SearchResults, PublicMealsList                                |
 | Skeletons         | `components/skeletons/*` as Suspense fallbacks                |
 
 ## Where the data comes from

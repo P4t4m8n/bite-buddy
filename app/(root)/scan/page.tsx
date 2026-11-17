@@ -1,5 +1,5 @@
+import PageHeader from "@/components/page-header";
 import BarcodeScanner from "@/components/scan/barcode-scanner";
-import { PageHeader } from "@/components/page-header";
 
 import type { Metadata } from "next";
 
